@@ -60,6 +60,7 @@ export async function initMotion(doc: Document = document): Promise<void> {
         '[data-scene="loop"]',
         '[data-scene="features"]',
         '[data-scene="evidence"]',
+        '[data-scene="install"]',
       ].join(", "),
     );
 
@@ -279,6 +280,32 @@ export async function initMotion(doc: Document = document): Promise<void> {
                 }
               };
             });
+          }
+
+          if (scene.dataset.scene === "install") {
+            const terminal = scene.querySelector<HTMLElement>(
+              "[data-install-terminal]",
+            );
+
+            if (!terminal) {
+              return;
+            }
+
+            gsap.fromTo(
+              terminal,
+              { opacity: 0.38, y: 24 },
+              {
+                duration: 0.8,
+                ease: "power2.out",
+                opacity: 1,
+                scrollTrigger: {
+                  once: true,
+                  start: "top 82%",
+                  trigger: terminal,
+                },
+                y: 0,
+              },
+            );
           }
         }, scene);
 
