@@ -1,0 +1,24 @@
+{
+  "stars": 6,
+  "forks": 2,
+  "latestRelease": {
+    "tag": "v3.7.0",
+    "publishedAt": "2026-07-16T03:56:09Z",
+    "url": "https://github.com/jagoff/memo/releases/tag/v3.7.0"
+  },
+  "releases": [
+    {
+      "tag": "v3.7.0",
+      "publishedAt": "2026-07-16T03:56:09Z",
+      "url": "https://github.com/jagoff/memo/releases/tag/v3.7.0"
+    },
+    {
+      "tag": "v3.5.2",
+      "publishedAt": "2026-07-15T18:32:21Z",
+      "url": "https://github.com/jagoff/memo/releases/tag/v3.5.2"
+    }
+  ],
+  "pypiVersion": "3.7.0",
+  "pypiUrl": "https://pypi.org/project/mlx-memo/",
+  "updatedAt": "2026-07-17T19:00:00.000Z"
+}
