@@ -207,6 +207,58 @@ describe("loadProjectData", () => {
     expect(fetcher).toHaveBeenCalledTimes(4);
   });
 
+  it("passes the supplied timeout signal and falls back after it aborts", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const signals: AbortSignal[] = [];
+    const fetcher = vi.fn(
+      async (url: RequestInfo | URL, init?: RequestInit) => {
+        if (String(url) !== "https://api.github.com/repos/jagoff/memo") {
+          return validApiResponse(url);
+        }
+
+        return new Promise<Response>((_resolve, reject) => {
+          const signal = init?.signal;
+
+          if (!(signal instanceof AbortSignal)) {
+            reject(new Error("missing abort signal"));
+            return;
+          }
+
+          signals.push(signal);
+
+          if (signal.aborted) {
+            reject(signal.reason);
+            return;
+          }
+
+          signal.addEventListener("abort", () => reject(signal.reason), {
+            once: true,
+          });
+        });
+      },
+    );
+
+    try {
+      const result = await loadProjectData({
+        fetcher,
+        snapshot,
+        timeoutMs: 0,
+        retryDelayMs: 0,
+      });
+
+      expect(result).toEqual({ data: snapshot, stale: true });
+      expect(fetcher).toHaveBeenCalledTimes(4);
+      expect(signals).toHaveLength(2);
+      expect(signals.every((signal) => signal.aborted)).toBe(true);
+      expect(
+        signals.every((signal) => signal.reason?.name === "TimeoutError"),
+      ).toBe(true);
+      expect(warn).toHaveBeenCalledTimes(1);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
   it.each([
     ["a non-2xx response", () => new Response("rate limited", { status: 429 })],
     [
