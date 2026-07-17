@@ -1,0 +1,121 @@
+---
+import type { LandingCopy } from "../../content";
+
+interface Props {
+  steps: LandingCopy["loop"]["steps"];
+}
+
+const { steps } = Astro.props;
+---
+
+<div class="recall-flow">
+  <svg
+    class="recall-connector"
+    viewBox="0 0 900 150"
+    aria-hidden="true"
+    focusable="false"
+    role="presentation"
+  >
+    <path d="M86 76C226 16 296 136 450 76S676 16 814 76"></path>
+    <circle cx="86" cy="76" r="7"></circle>
+    <circle cx="450" cy="76" r="7"></circle>
+    <circle cx="814" cy="76" r="7"></circle>
+  </svg>
+
+  <ol>
+    {
+      steps.map((step, index) => (
+        <li data-loop-step>
+          <span class="step-number" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <p>{step}</p>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .recall-flow {
+    position: relative;
+    padding-block: var(--space-12);
+  }
+
+  .recall-connector {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .recall-connector path {
+    fill: none;
+    stroke: color-mix(in srgb, var(--signal-300) 58%, var(--violet-400));
+    stroke-linecap: round;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .recall-connector circle {
+    fill: var(--ink-900);
+    stroke: var(--signal-300);
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+  }
+
+  ol {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  li {
+    display: grid;
+    min-height: 12rem;
+    align-content: space-between;
+    gap: var(--space-8);
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid color-mix(in srgb, var(--paper-200) 18%, transparent);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--ink-800) 94%, transparent);
+    box-shadow: 0 1.5rem 5rem rgba(7, 5, 13, 0.32);
+  }
+
+  .step-number {
+    color: var(--signal-300);
+    font: 700 0.75rem/1 var(--font-mono);
+    letter-spacing: 0.14em;
+  }
+
+  p {
+    max-width: 16ch;
+    margin: 0;
+    font: 520 clamp(1.25rem, 2vw, 1.75rem) / 1.25 var(--font-display);
+    text-wrap: balance;
+  }
+
+  @media (max-width: 799px) {
+    .recall-flow {
+      padding-block: var(--space-8) 0;
+    }
+
+    .recall-connector {
+      display: none;
+    }
+
+    ol {
+      grid-template-columns: 1fr;
+    }
+
+    li {
+      min-height: 9rem;
+    }
+  }
+</style>

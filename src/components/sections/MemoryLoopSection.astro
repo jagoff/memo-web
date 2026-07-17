@@ -1,0 +1,82 @@
+---
+import type { LandingCopy } from "../../content";
+import RecallFlow from "../visualizations/RecallFlow.astro";
+
+interface Props {
+  copy: LandingCopy["loop"];
+  id?: string;
+}
+
+const { copy, id } = Astro.props;
+---
+
+<section
+  class="memory-loop"
+  id={id}
+  data-scene="loop"
+  aria-labelledby="memory-loop-title"
+>
+  <div class="container">
+    <div class="loop-inner" data-loop-inner>
+      <div class="loop-heading">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h2 id="memory-loop-title">{copy.title}</h2>
+        <p class="loop-body">{copy.body}</p>
+      </div>
+
+      <RecallFlow steps={copy.steps} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .memory-loop {
+    position: relative;
+    padding-block: var(--space-section);
+    overflow: clip;
+    background:
+      radial-gradient(
+        circle at 50% 48%,
+        color-mix(in srgb, var(--violet-700) 20%, transparent),
+        transparent 48%
+      ),
+      var(--ink-950);
+  }
+
+  .loop-inner {
+    display: grid;
+    gap: clamp(3rem, 7vw, 6rem);
+    padding-block: var(--space-4);
+  }
+
+  .loop-heading {
+    display: grid;
+    max-width: 62rem;
+    gap: var(--space-6);
+  }
+
+  .loop-heading .eyebrow,
+  .loop-heading h2,
+  .loop-body {
+    margin: 0;
+  }
+
+  .loop-heading h2 {
+    max-width: 12ch;
+    font: 500 clamp(3rem, 7vw, 6.5rem) / 0.95 var(--font-display);
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .loop-body {
+    max-width: 50rem;
+    color: var(--paper-200);
+    font-size: clamp(1rem, 1.8vw, 1.25rem);
+  }
+
+  @media (max-width: 799px) {
+    .loop-inner {
+      gap: var(--space-12);
+    }
+  }
+</style>

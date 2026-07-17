@@ -1,0 +1,138 @@
+---
+import type { LandingCopy, Locale } from "../../content";
+import type { ProjectDataResult } from "../../lib/project-data";
+import ActivityChart from "../visualizations/ActivityChart.astro";
+import MemoryGraph from "../visualizations/MemoryGraph.astro";
+
+interface Props {
+  copy: LandingCopy["evidence"];
+  projectData: ProjectDataResult;
+  locale: Locale;
+  id?: string;
+}
+
+const { copy, projectData, locale, id } = Astro.props;
+---
+
+<section
+  class="evidence"
+  id={id}
+  data-scene="evidence"
+  aria-labelledby="evidence-title"
+>
+  <div class="container evidence-inner">
+    <div class="evidence-heading">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2 id="evidence-title">{copy.title}</h2>
+      <p class="evidence-body">{copy.body}</p>
+    </div>
+
+    <ActivityChart
+      copy={copy}
+      data={projectData.data}
+      locale={locale}
+      stale={projectData.stale}
+    />
+
+    <figure class="conceptual-graph" aria-labelledby="conceptual-graph-caption">
+      <figcaption id="conceptual-graph-caption">
+        <span aria-hidden="true"></span>
+        {copy.illustration}
+      </figcaption>
+      <div class="conceptual-graph-art">
+        <MemoryGraph />
+      </div>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .evidence {
+    position: relative;
+    padding-block: var(--space-section);
+    overflow: clip;
+    background:
+      radial-gradient(
+        circle at 16% 76%,
+        color-mix(in srgb, var(--violet-700) 22%, transparent),
+        transparent 34%
+      ),
+      var(--ink-950);
+  }
+
+  .evidence-inner {
+    display: grid;
+    gap: clamp(3.5rem, 8vw, 7rem);
+  }
+
+  .evidence-heading {
+    display: grid;
+    max-width: 62rem;
+    gap: var(--space-6);
+  }
+
+  .evidence-heading .eyebrow,
+  .evidence-heading h2,
+  .evidence-body {
+    margin: 0;
+  }
+
+  .evidence-heading h2 {
+    max-width: 11ch;
+    font: 500 clamp(3rem, 7vw, 6.5rem) / 0.95 var(--font-display);
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .evidence-body {
+    max-width: 52rem;
+    color: var(--paper-200);
+    font-size: clamp(1rem, 1.8vw, 1.25rem);
+  }
+
+  .conceptual-graph {
+    display: grid;
+    min-height: 30rem;
+    grid-template-columns: minmax(12rem, 0.55fr) minmax(18rem, 1fr);
+    align-items: center;
+    gap: clamp(2rem, 6vw, 7rem);
+    padding: clamp(1.5rem, 5vw, 4rem);
+    margin: 0;
+    border: 1px dashed color-mix(in srgb, var(--paper-200) 22%, transparent);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--ink-800) 58%, transparent);
+  }
+
+  .conceptual-graph figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--paper-200);
+    font: 700 0.75rem/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .conceptual-graph figcaption span {
+    width: 0.6rem;
+    height: 0.6rem;
+    flex: 0 0 auto;
+    border: 1px dashed var(--signal-300);
+    border-radius: 50%;
+  }
+
+  .conceptual-graph-art {
+    width: min(100%, 34rem);
+    justify-self: end;
+  }
+
+  @media (max-width: 720px) {
+    .conceptual-graph {
+      grid-template-columns: 1fr;
+    }
+
+    .conceptual-graph-art {
+      justify-self: center;
+    }
+  }
+</style>

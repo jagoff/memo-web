@@ -1,0 +1,398 @@
+---
+import type { LandingCopy, Locale } from "../../content";
+import { releasePoints } from "../../lib/charts";
+import type { ProjectData } from "../../lib/project-data";
+
+interface Props {
+  copy: LandingCopy["evidence"];
+  data: ProjectData;
+  locale: Locale;
+  stale: boolean;
+}
+
+interface ActivityLabels {
+  stars: string;
+  forks: string;
+  latestRelease: string;
+  pypiVersion: string;
+  chartTitle: string;
+  chartDescription: string;
+  releaseSource: string;
+  stale: string;
+}
+
+const activityLabels = {
+  en: {
+    stars: "GitHub stars",
+    forks: "GitHub forks",
+    latestRelease: "Latest release",
+    pypiVersion: "Current PyPI version",
+    chartTitle: "Recent GitHub releases",
+    chartDescription:
+      "Releases are ordered from oldest to newest. Vertical offsets are decorative and do not encode a value.",
+    releaseSource: "Release dates and links from GitHub",
+    stale: "Using the last verified snapshot from",
+  },
+  es: {
+    stars: "Estrellas en GitHub",
+    forks: "Forks en GitHub",
+    latestRelease: "Último release",
+    pypiVersion: "Versión actual en PyPI",
+    chartTitle: "Releases recientes en GitHub",
+    chartDescription:
+      "Los releases están ordenados del más antiguo al más reciente. Las variaciones verticales son decorativas y no representan un valor.",
+    releaseSource: "Fechas y enlaces de releases de GitHub",
+    stale: "Se usa la última copia verificada del",
+  },
+} satisfies Record<Locale, ActivityLabels>;
+
+const { copy, data, locale, stale } = Astro.props;
+const labels = activityLabels[locale];
+const chartWidth = 680;
+const chartHeight = 220;
+const points = releasePoints(data.releases, chartWidth, chartHeight);
+const polylinePoints = points.map(({ x, y }) => `${x},${y}`).join(" ");
+const localeTag = locale === "es" ? "es-AR" : "en-US";
+const dateFormatter = new Intl.DateTimeFormat(localeTag, {
+  dateStyle: "medium",
+  timeZone: "UTC",
+});
+const updatedDate = dateFormatter.format(new Date(data.updatedAt));
+const releaseDates = new Map(
+  data.releases.map((release) => [
+    release.tag,
+    dateFormatter.format(new Date(release.publishedAt)),
+  ]),
+);
+const chartTitleId = `release-chart-title-${locale}`;
+const chartDescriptionId = `release-chart-description-${locale}`;
+const metrics = [
+  {
+    label: labels.stars,
+    value: data.stars,
+    href: "https://github.com/jagoff/memo/stargazers",
+    source: "GitHub",
+    integer: true,
+  },
+  {
+    label: labels.forks,
+    value: data.forks,
+    href: "https://github.com/jagoff/memo/forks",
+    source: "GitHub",
+    integer: true,
+  },
+  {
+    label: labels.latestRelease,
+    value: data.latestRelease.tag,
+    href: data.latestRelease.url,
+    source: "GitHub",
+    integer: false,
+  },
+  {
+    label: labels.pypiVersion,
+    value: data.pypiVersion,
+    href: data.pypiUrl,
+    source: "PyPI",
+    integer: false,
+  },
+] as const;
+---
+
+<div class="activity-panel">
+  <dl class="metric-grid">
+    {
+      metrics.map((metric) => (
+        <div class="metric-card">
+          <dt>{metric.label}</dt>
+          <dd>
+            <a
+              href={metric.href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${metric.label}: ${metric.value} — ${metric.source}`}
+            >
+              <span
+                class="metric-value"
+                data-evidence-number={
+                  metric.integer ? String(metric.value) : undefined
+                }
+              >
+                {metric.value}
+              </span>
+              <span class="metric-source">
+                {metric.source}
+                <span aria-hidden="true">↗</span>
+              </span>
+            </a>
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  <figure class="release-chart">
+    <svg
+      viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+      role="img"
+      aria-labelledby={`${chartTitleId} ${chartDescriptionId}`}
+    >
+      <title id={chartTitleId}>{labels.chartTitle}</title>
+      <desc id={chartDescriptionId}>{labels.chartDescription}</desc>
+
+      <line class="chart-axis" x1="12" y1="202" x2="668" y2="202"></line>
+      {
+        points.length > 1 && (
+          <polyline class="release-line" points={polylinePoints} />
+        )
+      }
+      {
+        points.map((point, index) => {
+          const releaseDate = releaseDates.get(point.tag) ?? "";
+          const textAnchor =
+            index === 0
+              ? "start"
+              : index === points.length - 1
+                ? "end"
+                : "middle";
+
+          return (
+            <a
+              href={point.url}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${point.tag} — ${releaseDate}`}
+            >
+              <circle class="release-halo" cx={point.x} cy={point.y} r="11" />
+              <circle class="release-point" cx={point.x} cy={point.y} r="5" />
+              <line
+                class="release-tick"
+                x1={point.x}
+                y1={point.y + 12}
+                x2={point.x}
+                y2="202"
+              />
+              <text
+                class="release-tag"
+                x={point.x}
+                y={point.y - 18}
+                text-anchor={textAnchor}
+              >
+                {point.tag}
+              </text>
+            </a>
+          );
+        })
+      }
+    </svg>
+
+    <figcaption>
+      <div>
+        <strong>{labels.chartTitle}</strong>
+        <span>{labels.chartDescription}</span>
+      </div>
+      <a
+        href="https://github.com/jagoff/memo/releases"
+        target="_blank"
+        rel="noreferrer"
+      >
+        {labels.releaseSource}
+        <span aria-hidden="true">↗</span>
+      </a>
+    </figcaption>
+  </figure>
+
+  <p class="freshness" data-public-data-freshness>
+    {copy.updated}: <time datetime={data.updatedAt}>{updatedDate}</time>
+  </p>
+  {
+    stale && (
+      <p class="stale-note" data-public-data-stale>
+        {labels.stale} <time datetime={data.updatedAt}>{updatedDate}</time>.
+      </p>
+    )
+  }
+</div>
+
+<style>
+  .activity-panel {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .metric-grid {
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0;
+  }
+
+  .metric-card {
+    min-width: 0;
+    padding: var(--space-6);
+    border: 1px solid color-mix(in srgb, var(--paper-200) 14%, transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--ink-800) 92%, transparent);
+  }
+
+  dt {
+    min-height: 2.8em;
+    color: var(--muted-400);
+    font: 700 0.7rem/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: var(--space-6) 0 0;
+  }
+
+  dd a {
+    display: grid;
+    gap: var(--space-3);
+    text-decoration: none;
+  }
+
+  .metric-value {
+    overflow: hidden;
+    font: 520 clamp(1.75rem, 3vw, 2.75rem) / 1 var(--font-display);
+    letter-spacing: -0.04em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .metric-source {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--signal-300);
+    font: 700 0.68rem/1 var(--font-mono);
+  }
+
+  .release-chart {
+    padding: clamp(1rem, 3vw, 2rem);
+    margin: 0;
+    border: 1px solid color-mix(in srgb, var(--signal-300) 24%, transparent);
+    border-radius: var(--radius-md);
+    background:
+      linear-gradient(
+        color-mix(in srgb, var(--paper-200) 4%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--paper-200) 4%, transparent) 1px,
+        transparent 1px
+      ),
+      color-mix(in srgb, var(--ink-950) 84%, transparent);
+    background-size: 2rem 2rem;
+  }
+
+  .release-chart svg {
+    width: 100%;
+    min-height: 12rem;
+  }
+
+  .chart-axis,
+  .release-tick {
+    stroke: color-mix(in srgb, var(--paper-200) 28%, transparent);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .release-line {
+    fill: none;
+    stroke: var(--signal-300);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .release-halo {
+    fill: color-mix(in srgb, var(--signal-300) 12%, transparent);
+    stroke: color-mix(in srgb, var(--signal-300) 42%, transparent);
+    stroke-width: 1;
+  }
+
+  .release-point {
+    fill: var(--signal-300);
+  }
+
+  .release-tag {
+    fill: var(--paper-50);
+    font: 700 0.72rem/1 var(--font-mono);
+  }
+
+  figcaption {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+
+  figcaption div {
+    display: grid;
+    max-width: 46rem;
+    gap: var(--space-2);
+  }
+
+  figcaption strong {
+    font-size: 1rem;
+  }
+
+  figcaption span,
+  .freshness,
+  .stale-note {
+    color: var(--muted-400);
+    font-size: 0.84rem;
+  }
+
+  figcaption a {
+    display: inline-flex;
+    min-height: 44px;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--signal-300);
+    font: 700 0.72rem/1.4 var(--font-mono);
+    text-align: right;
+  }
+
+  .freshness,
+  .stale-note {
+    margin: 0;
+  }
+
+  .stale-note {
+    padding: var(--space-3) var(--space-4);
+    border-left: 2px solid var(--signal-300);
+    color: var(--paper-200);
+    background: color-mix(in srgb, var(--signal-300) 7%, transparent);
+  }
+
+  @media (max-width: 900px) {
+    .metric-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .metric-grid {
+      grid-template-columns: 1fr;
+    }
+
+    dt {
+      min-height: 0;
+    }
+
+    figcaption {
+      display: grid;
+    }
+
+    figcaption a {
+      text-align: left;
+    }
+  }
+</style>
