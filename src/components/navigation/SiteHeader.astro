@@ -1,0 +1,158 @@
+---
+import type { LandingCopy, Locale } from "../../content";
+import { localizedHref } from "../../lib/i18n";
+import LocaleSwitch from "./LocaleSwitch.astro";
+
+interface Props {
+  locale: Locale;
+  copy: LandingCopy["nav"];
+}
+
+const { locale, copy } = Astro.props;
+const navigationLabel =
+  locale === "en" ? "Primary navigation" : "Navegación principal";
+const homeLabel = locale === "en" ? "memo home" : "Inicio de memo";
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href={localizedHref(locale)} aria-label={homeLabel}>
+      <span class="brand-signal" aria-hidden="true"></span>
+      memo
+    </a>
+
+    <nav class="site-nav" aria-label={navigationLabel}>
+      <ul>
+        <li><a href={localizedHref(locale, "how")}>{copy.how}</a></li>
+        <li><a href={localizedHref(locale, "features")}>{copy.features}</a></li>
+        <li><a href={localizedHref(locale, "install")}>{copy.install}</a></li>
+        <li><a href="https://github.com/jagoff/memo">{copy.github}</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a
+        class="button button--primary install-action"
+        href={localizedHref(locale, "install")}
+      >
+        {copy.install}
+      </a>
+      <LocaleSwitch {locale} />
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    z-index: 50;
+    top: 0;
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--paper-200) 10%, transparent);
+    background: color-mix(in srgb, var(--ink-950) 84%, transparent);
+    backdrop-filter: blur(18px);
+  }
+
+  .header-inner {
+    display: grid;
+    min-height: 5rem;
+    align-items: center;
+    gap: var(--space-6);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font: 650 1.4rem/1 var(--font-display);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .brand-signal {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--signal-300);
+    box-shadow: 0 0 1.5rem
+      color-mix(in srgb, var(--signal-300) 72%, transparent);
+  }
+
+  .site-nav {
+    justify-self: center;
+  }
+
+  .site-nav ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2.2vw, 2rem);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .site-nav a {
+    color: var(--paper-200);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .site-nav a:hover {
+    color: var(--signal-300);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .install-action {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 900px) {
+    .header-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3) var(--space-4);
+      padding-block: var(--space-3);
+    }
+
+    .header-actions {
+      margin-left: auto;
+    }
+
+    .site-nav {
+      order: 3;
+      width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scrollbar-width: none;
+    }
+
+    .site-nav ul {
+      width: max-content;
+      min-width: 100%;
+      justify-content: space-between;
+      padding-inline: 0.1rem;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .header-inner {
+      width: min(100% - 24px, 1180px);
+    }
+
+    .header-actions {
+      gap: var(--space-2);
+    }
+
+    .install-action {
+      padding-inline: 0.75rem;
+      font-size: 0.8rem;
+    }
+  }
+</style>

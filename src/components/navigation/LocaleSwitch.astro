@@ -1,0 +1,92 @@
+---
+import type { Locale } from "../../content";
+import { localizedHref } from "../../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const label = locale === "en" ? "Choose language" : "Elegir idioma";
+const locales: readonly { code: Locale; label: string }[] = [
+  { code: "en", label: "EN" },
+  { code: "es", label: "ES" },
+];
+---
+
+<div class="locale-switch" role="group" aria-label={label}>
+  {
+    locales.map(({ code, label: localeLabel }) => (
+      <a
+        class="locale-link"
+        href={localizedHref(code)}
+        lang={code}
+        hreflang={code}
+        data-locale-link
+        data-locale={code}
+        aria-current={locale === code ? "page" : undefined}
+      >
+        {localeLabel}
+      </a>
+    ))
+  }
+</div>
+
+<script is:inline>
+  document.querySelectorAll("[data-locale-link]").forEach((link) => {
+    if (
+      !(link instanceof HTMLAnchorElement) ||
+      link.dataset.localeBound === "true"
+    ) {
+      return;
+    }
+
+    link.dataset.localeBound = "true";
+    link.addEventListener("click", () => {
+      const target = new URL(link.href);
+      target.hash = window.location.hash;
+      link.href = target.href;
+
+      const selectedLocale = link.dataset.locale;
+      if (selectedLocale) {
+        try {
+          window.localStorage.setItem("memo-locale", selectedLocale);
+        } catch {
+          // Storage can be unavailable; the real link remains functional.
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  .locale-switch {
+    display: inline-flex;
+    padding: 0.2rem;
+    border: 1px solid color-mix(in srgb, var(--paper-200) 22%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink-800) 82%, transparent);
+  }
+
+  .locale-link {
+    display: inline-flex;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: var(--muted-400);
+    font: 700 0.7rem/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  .locale-link[aria-current="page"] {
+    color: var(--ink-950);
+    background: var(--signal-300);
+  }
+
+  .locale-link:not([aria-current="page"]):hover {
+    color: var(--paper-50);
+  }
+</style>
