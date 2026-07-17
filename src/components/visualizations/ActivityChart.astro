@@ -133,8 +133,9 @@ const metrics = [
   <figure class="release-chart">
     <svg
       viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-      role="img"
-      aria-labelledby={`${chartTitleId} ${chartDescriptionId}`}
+      role="group"
+      aria-labelledby={chartTitleId}
+      aria-describedby={chartDescriptionId}
     >
       <title id={chartTitleId}>{labels.chartTitle}</title>
       <desc id={chartDescriptionId}>{labels.chartDescription}</desc>
