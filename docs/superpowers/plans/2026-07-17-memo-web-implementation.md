@@ -89,7 +89,7 @@ Create package.json:
   "type": "module",
   "packageManager": "pnpm@11.12.0",
   "engines": {
-    "node": ">=22.12 <27"
+    "node": "^22.13.0 || >=24 <27"
   },
   "scripts": {
     "dev": "astro dev",
@@ -128,6 +128,7 @@ Create package.json:
     "prettier-plugin-astro": "0.14.1",
     "tsx": "4.23.1",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.64.0",
     "vitest": "4.1.10"
   }
 }
@@ -199,14 +200,24 @@ Create tsconfig.json:
 }
 ~~~
 
-Create eslint.config.js:
+Create eslint.config.js with TypeScript coverage for both standalone files and Astro frontmatter:
 
 ~~~js
 import eslintPluginAstro from "eslint-plugin-astro";
+import tseslint from "typescript-eslint";
 
 export default [
   { ignores: ["dist/**", ".astro/**", "playwright-report/**", "test-results/**"] },
-  ...eslintPluginAstro.configs.recommended
+  ...tseslint.configs.recommended,
+  ...eslintPluginAstro.configs.recommended,
+  {
+    files: ["**/*.astro"],
+    languageOptions: {
+      parserOptions: {
+        parser: tseslint.parser
+      }
+    }
+  }
 ];
 ~~~
 
