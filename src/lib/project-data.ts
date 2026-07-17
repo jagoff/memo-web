@@ -4,23 +4,55 @@ import projectSnapshot from "../data/project-snapshot.json";
 
 const PROJECT_URL = "https://api.github.com/repos/jagoff/memo";
 const RELEASES_URL = `${PROJECT_URL}/releases?per_page=5`;
-const PYPI_URL = "https://pypi.org/pypi/mlx-memo/json";
+const PYPI_API_URL = "https://pypi.org/pypi/mlx-memo/json";
+const PYPI_PROJECT_URL = "https://pypi.org/project/mlx-memo/";
+const GITHUB_RELEASE_PATH_PREFIX = "/jagoff/memo/releases/";
+
+const GitHubReleaseUrlSchema = z.url().refine(
+  (value) => {
+    const url = new URL(value);
+
+    return (
+      url.origin === "https://github.com" &&
+      url.pathname.startsWith(GITHUB_RELEASE_PATH_PREFIX) &&
+      url.pathname.length > GITHUB_RELEASE_PATH_PREFIX.length
+    );
+  },
+  { message: "Expected a jagoff/memo GitHub release URL" },
+);
 
 const ReleaseSchema = z.object({
   tag: z.string().min(1),
   publishedAt: z.iso.datetime({ offset: true }),
-  url: z.url(),
+  url: GitHubReleaseUrlSchema,
 });
 
-export const ProjectDataSchema = z.object({
-  stars: z.number().int().nonnegative(),
-  forks: z.number().int().nonnegative(),
-  latestRelease: ReleaseSchema,
-  releases: z.array(ReleaseSchema).min(1),
-  pypiVersion: z.string().min(1),
-  pypiUrl: z.url(),
-  updatedAt: z.iso.datetime({ offset: true }),
-});
+export const ProjectDataSchema = z
+  .object({
+    stars: z.number().int().nonnegative(),
+    forks: z.number().int().nonnegative(),
+    latestRelease: ReleaseSchema,
+    releases: z.array(ReleaseSchema).min(1),
+    pypiVersion: z.string().min(1),
+    pypiUrl: z.literal(PYPI_PROJECT_URL),
+    updatedAt: z.iso.datetime({ offset: true }),
+  })
+  .superRefine((data, context) => {
+    const firstRelease = data.releases[0];
+
+    if (
+      !firstRelease ||
+      firstRelease.tag !== data.latestRelease.tag ||
+      firstRelease.publishedAt !== data.latestRelease.publishedAt ||
+      firstRelease.url !== data.latestRelease.url
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "latestRelease must equal releases[0]",
+        path: ["latestRelease"],
+      });
+    }
+  });
 
 export type ProjectData = z.infer<typeof ProjectDataSchema>;
 
@@ -52,7 +84,7 @@ const GitHubReleaseSchema = z.union([
     .object({
       tag_name: z.string().min(1),
       published_at: z.iso.datetime({ offset: true }),
-      html_url: z.url(),
+      html_url: GitHubReleaseUrlSchema,
     })
     .transform((release) => ({
       tag: release.tag_name,
@@ -67,7 +99,7 @@ const GitHubReleasesSchema = z.array(GitHubReleaseSchema).min(1);
 const PyPiProjectSchema = z.object({
   info: z.object({
     version: z.string().min(1),
-    package_url: z.url(),
+    package_url: z.literal(PYPI_PROJECT_URL),
   }),
 });
 
@@ -110,7 +142,9 @@ async function fetchJson<T>(
 export async function loadProjectData(
   options: LoadProjectDataOptions = {},
 ): Promise<ProjectDataResult> {
-  const snapshot = ProjectDataSchema.parse(options.snapshot ?? projectSnapshot);
+  const snapshotResult = ProjectDataSchema.safeParse(
+    options.snapshot ?? projectSnapshot,
+  );
   const fetcher = options.fetcher ?? fetch;
   const now = options.now ?? (() => new Date());
   const timeoutMs = options.timeoutMs ?? 2500;
@@ -132,7 +166,13 @@ export async function loadProjectData(
         timeoutMs,
         retryDelayMs,
       ),
-      fetchJson(fetcher, PYPI_URL, PyPiProjectSchema, timeoutMs, retryDelayMs),
+      fetchJson(
+        fetcher,
+        PYPI_API_URL,
+        PyPiProjectSchema,
+        timeoutMs,
+        retryDelayMs,
+      ),
     ]);
 
     const latestRelease = releases[0];
@@ -153,10 +193,20 @@ export async function loadProjectData(
 
     return { data, stale: false };
   } catch (error) {
-    console.warn(
-      "Unable to refresh public project data; using snapshot.",
-      error,
+    if (snapshotResult.success) {
+      console.warn(
+        "Unable to refresh public project data; using snapshot.",
+        error,
+      );
+      return { data: snapshotResult.data, stale: true };
+    }
+
+    const failure = new AggregateError(
+      [error, snapshotResult.error],
+      "Remote project data and the local snapshot are invalid.",
     );
-    return { data: snapshot, stale: true };
+
+    console.warn("Unable to load public project data.", failure);
+    throw failure;
   }
 }
