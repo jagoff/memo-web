@@ -6,7 +6,7 @@
 
 **Architecture:** Astro generates English and Spanish static routes from one typed content contract. Small Astro components own each section, browser-native TypeScript owns interaction and GSAP scenes, and build-time adapters load validated GitHub/PyPI data with a checked-in snapshot fallback. Vercel serves only the generated dist directory; there are no runtime functions or visitor-side third-party data calls.
 
-**Tech Stack:** Node.js 24, pnpm 11.12.0, Astro 7.1.1, TypeScript 7.0.2, GSAP 3.15.0, Zod 4.4.3, Vitest 4.1.10, Playwright 1.61.1, axe 4.12.1, Lighthouse CI 0.15.1.
+**Tech Stack:** Node.js 24, pnpm 11.12.0, Astro 7.0.9, TypeScript 6.0.3, GSAP 3.15.0, Zod 4.4.3, Vitest 4.1.10, Playwright 1.61.1, axe 4.12.1, Lighthouse CI 0.15.1.
 
 ## Global Constraints
 
@@ -29,7 +29,7 @@
 
 The implementation creates these focused units:
 
-- package.json, pnpm-lock.yaml, .node-version: deterministic toolchain.
+- package.json, pnpm-lock.yaml, pnpm-workspace.yaml, .node-version: deterministic toolchain and explicit native build allowlist.
 - astro.config.ts, tsconfig.json, eslint.config.js, prettier.config.mjs: build and quality configuration.
 - src/content/types.ts, en.ts, es.ts: one typed bilingual content contract.
 - src/lib/i18n.ts: locale lookup and anchor-preserving URL mapping.
@@ -59,6 +59,7 @@ The implementation creates these focused units:
 **Files:**
 - Create: package.json
 - Create: pnpm-lock.yaml
+- Create: pnpm-workspace.yaml
 - Create: .node-version
 - Create: .gitignore
 - Create: astro.config.ts
@@ -110,7 +111,7 @@ Create package.json:
   "dependencies": {
     "@fontsource-variable/fraunces": "5.2.9",
     "@fontsource-variable/geist": "5.2.9",
-    "astro": "7.1.1",
+    "astro": "7.0.9",
     "gsap": "3.15.0",
     "zod": "4.4.3"
   },
@@ -126,7 +127,7 @@ Create package.json:
     "prettier": "3.9.5",
     "prettier-plugin-astro": "0.14.1",
     "tsx": "4.23.1",
-    "typescript": "7.0.2",
+    "typescript": "6.0.3",
     "vitest": "4.1.10"
   }
 }
@@ -136,6 +137,14 @@ Create .node-version with exactly:
 
 ~~~text
 24
+~~~
+
+Create pnpm-workspace.yaml to allow only the native build scripts required by Astro:
+
+~~~yaml
+allowBuilds:
+  esbuild: true
+  sharp: true
 ~~~
 
 Create .gitignore:
@@ -213,6 +222,8 @@ export default {
 Create vitest.config.ts:
 
 ~~~ts
+/// <reference types="vitest/config" />
+
 import { getViteConfig } from "astro/config";
 
 export default getViteConfig({
@@ -227,6 +238,8 @@ export default getViteConfig({
 Create vitest.build.config.ts:
 
 ~~~ts
+/// <reference types="vitest/config" />
+
 import { getViteConfig } from "astro/config";
 
 export default getViteConfig({
@@ -250,7 +263,7 @@ Run:
 pnpm install
 ~~~
 
-Expected: pnpm-lock.yaml is created and the command exits 0.
+Expected: pnpm-lock.yaml is created, esbuild/sharp are the only approved dependency build scripts, and the command exits 0.
 
 - [ ] **Step 3: Write the failing route test**
 
@@ -319,7 +332,7 @@ Expected: one passing test, zero Astro/TypeScript errors, and dist/index.html pl
 - [ ] **Step 6: Commit**
 
 ~~~bash
-git add package.json pnpm-lock.yaml .node-version .gitignore astro.config.ts tsconfig.json eslint.config.js prettier.config.mjs vitest.config.ts vitest.build.config.ts src tests
+git add package.json pnpm-lock.yaml pnpm-workspace.yaml .node-version .gitignore astro.config.ts tsconfig.json eslint.config.js prettier.config.mjs vitest.config.ts vitest.build.config.ts src tests
 git commit -m "chore: bootstrap Astro landing project"
 ~~~
 
