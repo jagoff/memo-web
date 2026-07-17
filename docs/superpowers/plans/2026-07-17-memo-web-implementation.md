@@ -145,6 +145,7 @@ node_modules/
 dist/
 .astro/
 .vercel/
+.worktrees/
 coverage/
 playwright-report/
 test-results/
