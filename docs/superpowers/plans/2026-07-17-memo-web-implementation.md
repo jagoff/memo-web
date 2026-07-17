@@ -146,6 +146,7 @@ dist/
 .astro/
 .vercel/
 .worktrees/
+.superpowers/
 coverage/
 playwright-report/
 test-results/
