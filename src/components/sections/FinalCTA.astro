@@ -1,0 +1,102 @@
+---
+import type { LandingCopy } from "../../content";
+
+interface Props {
+  copy: LandingCopy["final"];
+}
+
+const { copy } = Astro.props;
+---
+
+<section class="final-cta" aria-labelledby="final-cta-title">
+  <div class="container final-cta-inner">
+    <span class="cta-signal" aria-hidden="true"></span>
+    <p class="eyebrow">{copy.eyebrow}</p>
+    <h2 id="final-cta-title">{copy.title}</h2>
+    <p class="final-body">{copy.body}</p>
+    <div class="final-actions">
+      <a class="button button--primary" href="#install">{copy.install}</a>
+      <a class="button button--secondary" href="https://github.com/jagoff/memo">
+        {copy.github}
+        <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .final-cta {
+    position: relative;
+    padding-block: var(--space-section);
+    overflow: clip;
+    border-top: 1px solid color-mix(in srgb, var(--paper-200) 10%, transparent);
+    background:
+      radial-gradient(
+        circle at 50% 52%,
+        color-mix(in srgb, var(--signal-400) 12%, transparent),
+        transparent 33%
+      ),
+      linear-gradient(180deg, var(--ink-900), var(--ink-950));
+  }
+
+  .final-cta-inner {
+    display: grid;
+    max-width: 62rem;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .cta-signal {
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-bottom: var(--space-6);
+    border-radius: 50%;
+    background: var(--signal-300);
+    box-shadow: 0 0 2rem color-mix(in srgb, var(--signal-300) 76%, transparent);
+  }
+
+  .final-cta .eyebrow,
+  .final-cta h2,
+  .final-body {
+    margin: 0;
+  }
+
+  .final-cta h2 {
+    margin-top: var(--space-6);
+    font: 500 clamp(3.5rem, 9vw, 8rem) / 0.9 var(--font-display);
+    letter-spacing: -0.055em;
+    text-wrap: balance;
+  }
+
+  .final-body {
+    max-width: 42rem;
+    margin-top: var(--space-8);
+    color: var(--paper-200);
+    font-size: clamp(1rem, 1.8vw, 1.25rem);
+  }
+
+  .final-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+  }
+
+  .button--secondary {
+    border-color: color-mix(in srgb, var(--paper-200) 34%, transparent);
+    color: var(--paper-50);
+    background: color-mix(in srgb, var(--ink-800) 72%, transparent);
+  }
+
+  .button--secondary:hover {
+    border-color: var(--signal-300);
+  }
+
+  @media (max-width: 480px) {
+    .final-actions {
+      width: 100%;
+      flex-direction: column;
+    }
+  }
+</style>

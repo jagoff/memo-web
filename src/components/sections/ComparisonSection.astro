@@ -1,0 +1,147 @@
+---
+import type { LandingCopy } from "../../content";
+
+interface Props {
+  copy: LandingCopy["comparison"];
+  id?: string;
+}
+
+const { copy, id = "comparison" } = Astro.props;
+---
+
+<section class="comparison" {id} aria-labelledby={`${id}-title`}>
+  <div class="container comparison-inner">
+    <div class="comparison-heading">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2 id={`${id}-title`}>{copy.title}</h2>
+    </div>
+
+    <div
+      class="table-shell"
+      role="region"
+      aria-labelledby={`${id}-title`}
+      tabindex="0"
+    >
+      <table>
+        <caption>
+          {copy.body}
+        </caption>
+        <thead>
+          <tr>
+            {copy.headers.map((header) => <th scope="col">{header}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            copy.rows.map((row) => (
+              <tr>
+                <th scope="row">{row.capability}</th>
+                <td class="memo-value">{row.memo}</td>
+                <td>{row.cloud}</td>
+                <td>{row.vector}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <a
+      class="comparison-link"
+      href="https://github.com/jagoff/memo#what-makes-memo-different"
+    >
+      {copy.full}
+      <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .comparison {
+    padding-block: var(--space-section);
+    background: var(--ink-950);
+  }
+
+  .comparison-inner {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .comparison-heading {
+    display: grid;
+    max-width: 62rem;
+    gap: var(--space-6);
+  }
+
+  .comparison-heading .eyebrow,
+  .comparison-heading h2 {
+    margin: 0;
+  }
+
+  .comparison-heading h2 {
+    max-width: 13ch;
+    font: 500 clamp(3rem, 7vw, 6.5rem) / 0.95 var(--font-display);
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .table-shell {
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid color-mix(in srgb, var(--paper-200) 16%, transparent);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--ink-800) 62%, transparent);
+  }
+
+  table {
+    width: 100%;
+    min-width: 45rem;
+    border-collapse: collapse;
+  }
+
+  caption {
+    padding: clamp(1.25rem, 3vw, 2rem);
+    color: var(--paper-200);
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    text-align: left;
+  }
+
+  th,
+  td {
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    border-top: 1px solid color-mix(in srgb, var(--paper-200) 12%, transparent);
+    text-align: left;
+  }
+
+  thead th {
+    color: var(--muted-400);
+    font: 700 0.74rem/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  tbody th {
+    color: var(--paper-50);
+    font-weight: 650;
+  }
+
+  tbody td {
+    color: var(--paper-200);
+  }
+
+  .memo-value {
+    color: var(--signal-300);
+    font-weight: 800;
+  }
+
+  .comparison-link {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 44px;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--signal-300);
+    font-weight: 750;
+    text-underline-offset: 0.3em;
+  }
+</style>

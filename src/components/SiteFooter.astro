@@ -1,0 +1,95 @@
+---
+import type { LandingCopy } from "../content";
+
+interface Props {
+  copy: LandingCopy["footer"];
+}
+
+const { copy } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span aria-hidden="true"></span>
+      memo
+    </div>
+
+    <ul class="project-links">
+      <li><a href="https://github.com/jagoff/memo">{copy.source}</a></li>
+      <li><a href="https://pypi.org/project/mlx-memo/">{copy.pypi}</a></li>
+      <li>
+        <a href="https://opensource.org/license/mit/">{copy.license}</a>
+      </li>
+    </ul>
+
+    <a class="author-link" href="https://github.com/jagoff">{copy.by}</a>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: var(--space-8);
+    border-top: 1px solid color-mix(in srgb, var(--paper-200) 12%, transparent);
+    background: var(--ink-950);
+  }
+
+  .footer-inner {
+    display: grid;
+    align-items: center;
+    gap: var(--space-6);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .footer-brand {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: var(--space-2);
+    font: 650 1.15rem/1 var(--font-display);
+    text-decoration: none;
+  }
+
+  .footer-brand span {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--signal-300);
+  }
+
+  .project-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2) var(--space-6);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .project-links a,
+  .author-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: var(--muted-400);
+    font-size: 0.86rem;
+    text-underline-offset: 0.25em;
+  }
+
+  .project-links a:hover,
+  .author-link:hover {
+    color: var(--signal-300);
+  }
+
+  @media (max-width: 760px) {
+    .footer-inner {
+      justify-items: center;
+      grid-template-columns: 1fr;
+    }
+
+    .author-link {
+      text-align: center;
+    }
+  }
+</style>

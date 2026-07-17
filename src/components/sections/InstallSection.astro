@@ -1,0 +1,332 @@
+---
+import type { LandingCopy } from "../../content";
+
+interface Props {
+  copy: LandingCopy["install"];
+  id?: string;
+}
+
+const { copy, id = "install" } = Astro.props;
+const MACOS_COMMAND =
+  "curl -fsSL https://raw.githubusercontent.com/jagoff/memo/master/install.sh | bash";
+const LINUX_COMMAND = 'pipx install "mlx-memo[cpu]"';
+const statusId = `${id}-copy-status`;
+---
+
+<section
+  class="install-section"
+  {id}
+  data-scene="install"
+  aria-labelledby={`${id}-title`}
+>
+  <div class="container install-inner">
+    <div class="install-heading">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2 id={`${id}-title`}>{copy.title}</h2>
+      <p>{copy.body}</p>
+    </div>
+
+    <div class="terminal" data-platform-tabs data-default-platform="macos">
+      <div class="terminal-bar" aria-hidden="true">
+        <span></span><span></span><span></span>
+        <span class="terminal-title">memo</span>
+      </div>
+
+      <div class="platform-list" data-platform-list>
+        <button
+          id={`${id}-tab-macos`}
+          class="platform-tab"
+          type="button"
+          data-platform-tab="macos"
+          aria-controls={`${id}-panel-macos`}
+        >
+          {copy.macos}
+        </button>
+        <button
+          id={`${id}-tab-linux`}
+          class="platform-tab"
+          type="button"
+          data-platform-tab="linux"
+          aria-controls={`${id}-panel-linux`}
+        >
+          {copy.linux}
+        </button>
+      </div>
+
+      <div class="platform-panels">
+        <article
+          id={`${id}-panel-macos`}
+          class="command-panel"
+          data-platform-panel="macos"
+          aria-labelledby={`${id}-tab-macos`}
+        >
+          <h3>{copy.macos}</h3>
+          <div class="command-row">
+            <code>{MACOS_COMMAND}</code>
+            <button
+              class="copy-action"
+              type="button"
+              data-copy={MACOS_COMMAND}
+              data-success={copy.copied}
+              data-failure={copy.copyFailed}
+              data-status={statusId}
+              aria-describedby={statusId}
+            >
+              {copy.copy}
+            </button>
+          </div>
+        </article>
+
+        <article
+          id={`${id}-panel-linux`}
+          class="command-panel"
+          data-platform-panel="linux"
+          aria-labelledby={`${id}-tab-linux`}
+        >
+          <h3>{copy.linux}</h3>
+          <div class="command-row">
+            <code>{LINUX_COMMAND}</code>
+            <button
+              class="copy-action"
+              type="button"
+              data-copy={LINUX_COMMAND}
+              data-success={copy.copied}
+              data-failure={copy.copyFailed}
+              data-status={statusId}
+              aria-describedby={statusId}
+            >
+              {copy.copy}
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <p
+        id={statusId}
+        class="copy-status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+      </p>
+    </div>
+
+    <a class="docs-link" href="https://github.com/jagoff/memo#installation">
+      {copy.docs}
+      <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .install-section {
+    position: relative;
+    padding-block: var(--space-section);
+    overflow: clip;
+    border-block: 1px solid
+      color-mix(in srgb, var(--paper-200) 10%, transparent);
+    background:
+      radial-gradient(
+        circle at 80% 20%,
+        color-mix(in srgb, var(--violet-700) 24%, transparent),
+        transparent 35%
+      ),
+      var(--ink-900);
+  }
+
+  .install-inner {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .install-heading {
+    display: grid;
+    max-width: 58rem;
+    gap: var(--space-6);
+  }
+
+  .install-heading .eyebrow,
+  .install-heading h2,
+  .install-heading p {
+    margin: 0;
+  }
+
+  .install-heading h2 {
+    max-width: 11ch;
+    font: 500 clamp(3rem, 7vw, 6.5rem) / 0.95 var(--font-display);
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .install-heading p:last-child {
+    max-width: 50rem;
+    color: var(--paper-200);
+    font-size: clamp(1rem, 1.8vw, 1.25rem);
+  }
+
+  .terminal {
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--paper-200) 18%, transparent);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--ink-950) 94%, transparent);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .terminal-bar {
+    display: flex;
+    min-height: 3rem;
+    align-items: center;
+    gap: 0.45rem;
+    padding-inline: var(--space-6);
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--paper-200) 12%, transparent);
+    color: var(--muted-400);
+    background: color-mix(in srgb, var(--ink-800) 72%, transparent);
+  }
+
+  .terminal-bar > span:not(.terminal-title) {
+    width: 0.55rem;
+    height: 0.55rem;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .terminal-title {
+    margin-left: auto;
+    font: 650 0.7rem/1 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .platform-list {
+    display: none;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6) 0;
+  }
+
+  [data-platform-enhanced="true"] .platform-list {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .platform-tab,
+  .copy-action {
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid color-mix(in srgb, var(--paper-200) 24%, transparent);
+    border-radius: var(--radius-sm);
+    color: var(--paper-200);
+    background: transparent;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .platform-tab {
+    padding: 0.65rem 1rem;
+  }
+
+  .platform-tab[aria-selected="true"] {
+    border-color: var(--signal-300);
+    color: var(--ink-950);
+    background: var(--signal-300);
+  }
+
+  .platform-panels {
+    display: grid;
+    gap: var(--space-3);
+    padding: clamp(1rem, 3vw, 2rem);
+  }
+
+  .command-panel {
+    display: grid;
+    gap: var(--space-3);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border: 1px solid color-mix(in srgb, var(--paper-200) 12%, transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--ink-800) 55%, transparent);
+  }
+
+  .command-panel[hidden] {
+    display: none;
+  }
+
+  .command-panel h3 {
+    margin: 0;
+    color: var(--muted-400);
+    font: 700 0.72rem/1.2 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .command-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  code {
+    min-width: 0;
+    flex: 1;
+    overflow-wrap: anywhere;
+    color: var(--paper-50);
+    font: 600 clamp(0.82rem, 1.6vw, 1rem) / 1.7 var(--font-mono);
+    user-select: all;
+  }
+
+  .copy-action {
+    display: none;
+    flex: 0 0 auto;
+    padding: 0.65rem 0.9rem;
+  }
+
+  [data-platform-enhanced="true"] .copy-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .copy-action:hover,
+  .copy-action[data-copy-state="success"] {
+    border-color: var(--signal-300);
+    color: var(--signal-300);
+  }
+
+  .copy-action[data-copy-state="failure"] {
+    border-color: var(--violet-400);
+  }
+
+  .copy-action:disabled {
+    cursor: wait;
+    opacity: 0.62;
+  }
+
+  .copy-status {
+    min-height: 1.6rem;
+    padding-inline: clamp(1rem, 3vw, 2rem);
+    margin: 0 0 var(--space-4);
+    color: var(--signal-300);
+    font: 650 0.8rem/1.5 var(--font-mono);
+  }
+
+  .docs-link {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 44px;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--signal-300);
+    font-weight: 750;
+    text-underline-offset: 0.3em;
+  }
+
+  @media (max-width: 680px) {
+    .command-row {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .copy-action {
+      width: 100%;
+    }
+  }
+</style>
