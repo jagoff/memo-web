@@ -1,0 +1,186 @@
+---
+import type { LandingCopy } from "../../content";
+
+interface Props {
+  copy: LandingCopy["problem"];
+}
+
+const { copy } = Astro.props;
+---
+
+<section class="problem" data-scene="problem" aria-labelledby="problem-title">
+  <div class="container problem-inner">
+    <div class="problem-heading">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2 id="problem-title">{copy.title}</h2>
+      <p class="problem-body">{copy.body}</p>
+    </div>
+
+    <div class="session-story">
+      <div class="session-card session-card--lost">
+        <span class="session-signal" aria-hidden="true"></span>
+        <p>{copy.lost}</p>
+      </div>
+
+      <div class="thread-shell" aria-hidden="true">
+        <svg viewBox="0 0 200 80" focusable="false" role="presentation">
+          <path
+            class="problem-thread"
+            data-problem-connector
+            pathLength="1"
+            d="M4 40C42 8 62 72 98 40C130 12 151 69 196 40"></path>
+        </svg>
+      </div>
+
+      <div class="session-card session-card--kept">
+        <span class="session-signal" aria-hidden="true"></span>
+        <p>{copy.kept}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .problem {
+    position: relative;
+    padding-block: var(--space-section);
+    overflow: clip;
+    background:
+      radial-gradient(
+        circle at 50% 85%,
+        color-mix(in srgb, var(--signal-400) 8%, transparent),
+        transparent 40%
+      ),
+      var(--ink-900);
+  }
+
+  .problem-inner {
+    display: grid;
+    gap: clamp(4rem, 9vw, 8rem);
+  }
+
+  .problem-heading {
+    display: grid;
+    max-width: 56rem;
+    gap: var(--space-6);
+  }
+
+  .problem-heading .eyebrow,
+  .problem-heading h2,
+  .problem-body,
+  .session-card p {
+    margin: 0;
+  }
+
+  .problem-heading h2 {
+    max-width: 11ch;
+    font: 500 clamp(3rem, 7vw, 6.5rem) / 0.95 var(--font-display);
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .problem-body {
+    max-width: 48rem;
+    color: var(--paper-200);
+    font-size: clamp(1rem, 1.8vw, 1.25rem);
+  }
+
+  .session-story {
+    display: grid;
+    align-items: center;
+    gap: clamp(1rem, 2.5vw, 2.5rem);
+    grid-template-columns: minmax(0, 1fr) clamp(4rem, 12vw, 10rem) minmax(
+        0,
+        1fr
+      );
+  }
+
+  .session-card {
+    position: relative;
+    display: grid;
+    min-height: 13rem;
+    align-content: space-between;
+    gap: var(--space-8);
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border: 1px solid color-mix(in srgb, var(--paper-200) 14%, transparent);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--ink-800) 88%, transparent);
+  }
+
+  .session-card::after {
+    position: absolute;
+    right: var(--space-6);
+    bottom: var(--space-6);
+    width: 3rem;
+    height: 1px;
+    background: currentColor;
+    content: "";
+    opacity: 0.4;
+  }
+
+  .session-card--lost {
+    border-style: dashed;
+    color: var(--muted-400);
+  }
+
+  .session-card--kept {
+    border-color: color-mix(in srgb, var(--signal-300) 38%, transparent);
+    color: var(--paper-50);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .session-card p {
+    max-width: 24ch;
+    font: 500 clamp(1.2rem, 2.2vw, 1.65rem) / 1.35 var(--font-display);
+    text-wrap: balance;
+  }
+
+  .session-signal {
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .session-card--lost .session-signal {
+    border-style: dashed;
+  }
+
+  .session-card--kept .session-signal {
+    border-color: var(--signal-300);
+    background: var(--signal-300);
+    box-shadow: 0 0 1.5rem
+      color-mix(in srgb, var(--signal-300) 70%, transparent);
+  }
+
+  .thread-shell svg {
+    width: 100%;
+    overflow: visible;
+  }
+
+  .problem-thread {
+    fill: none;
+    stroke: var(--signal-300);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+  }
+
+  @media (max-width: 760px) {
+    .session-story {
+      grid-template-columns: 1fr;
+    }
+
+    .thread-shell {
+      width: 5rem;
+      justify-self: center;
+      transform: rotate(90deg);
+    }
+
+    .session-card {
+      min-height: 10rem;
+    }
+  }
+</style>

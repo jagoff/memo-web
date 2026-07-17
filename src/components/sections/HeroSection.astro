@@ -1,0 +1,207 @@
+---
+import type { LandingCopy } from "../../content";
+import MemoryGraph from "../visualizations/MemoryGraph.astro";
+
+interface Props {
+  copy: LandingCopy["hero"];
+}
+
+const { copy } = Astro.props;
+const agents = ["Claude Code", "Codex", "Cursor", "Devin", "Cline", "MCP"];
+---
+
+<section class="hero" data-scene="hero" aria-labelledby="hero-title">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1 class="display" id="hero-title">{copy.title}</h1>
+      <p class="hero-body">{copy.body}</p>
+
+      <div class="hero-actions">
+        <a class="button button--primary" href="#install">{copy.install}</a>
+        <a
+          class="button button--secondary"
+          href="https://github.com/jagoff/memo"
+        >
+          {copy.github}
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+
+      <ul class="agent-list">
+        {
+          agents.map((agent) => (
+            <li>
+              <span aria-hidden="true" />
+              {agent}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="hero-graph">
+      <MemoryGraph />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: max(44rem, calc(100svh - 5rem));
+    overflow: clip;
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--paper-200) 10%, transparent);
+    background:
+      radial-gradient(
+        circle at 76% 46%,
+        color-mix(in srgb, var(--violet-700) 24%, transparent),
+        transparent 42%
+      ),
+      linear-gradient(180deg, var(--ink-950), var(--ink-900));
+  }
+
+  .hero::before {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(
+        color-mix(in srgb, var(--paper-200) 4%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--paper-200) 4%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 5rem 5rem;
+    content: "";
+    mask-image: linear-gradient(to bottom, black, transparent 88%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    min-height: inherit;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 6rem);
+    grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
+    padding-block: clamp(4.5rem, 10vw, 8rem);
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-copy .eyebrow {
+    margin: 0 0 var(--space-6);
+  }
+
+  .hero-copy .display {
+    max-width: 8.5ch;
+  }
+
+  .hero-body {
+    max-width: 35rem;
+    margin: var(--space-8) 0 0;
+    color: var(--paper-200);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.55;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+  }
+
+  .button--secondary {
+    border-color: color-mix(in srgb, var(--paper-200) 34%, transparent);
+    color: var(--paper-50);
+    background: color-mix(in srgb, var(--ink-800) 72%, transparent);
+  }
+
+  .button--secondary:hover {
+    border-color: var(--signal-300);
+  }
+
+  .agent-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: 0;
+    margin: var(--space-12) 0 0;
+    list-style: none;
+  }
+
+  .agent-list li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid color-mix(in srgb, var(--paper-200) 15%, transparent);
+    border-radius: 999px;
+    color: var(--muted-400);
+    background: color-mix(in srgb, var(--ink-800) 68%, transparent);
+    font: 650 0.72rem/1 var(--font-mono);
+  }
+
+  .agent-list span {
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: var(--signal-300);
+    box-shadow: 0 0 0.75rem
+      color-mix(in srgb, var(--signal-300) 70%, transparent);
+  }
+
+  .hero-graph {
+    width: min(48vw, 42rem);
+    justify-self: end;
+  }
+
+  @media (max-width: 840px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      padding-top: clamp(4rem, 12vw, 6rem);
+    }
+
+    .hero-copy .display {
+      max-width: 10ch;
+    }
+
+    .hero-graph {
+      width: min(100%, 34rem);
+      justify-self: center;
+      margin-top: calc(var(--space-8) * -1);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      min-height: auto;
+    }
+
+    .hero-inner {
+      gap: var(--space-12);
+      padding-block: var(--space-16);
+    }
+
+    .hero-actions {
+      display: grid;
+    }
+
+    .agent-list {
+      margin-top: var(--space-8);
+    }
+
+    .hero-graph {
+      margin-top: 0;
+    }
+  }
+</style>
