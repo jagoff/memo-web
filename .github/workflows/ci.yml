@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.12.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type-check Astro
+        run: pnpm check
+
+      - name: Build static site
+        run: pnpm build
+
+      - name: Run unit tests
+        run: pnpm test
+
+      - name: Verify build output
+        run: pnpm test:build
+
+      - name: Enforce JavaScript budget
+        run: pnpm budget
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run behavior tests
+        run: pnpm test:e2e --project=chromium
+
+      - name: Run accessibility tests
+        run: pnpm test:a11y --project=chromium
+
+      - name: Run visual regression tests
+        run: pnpm test:visual --project=chromium
+
+      - name: Run Lighthouse budgets
+        run: pnpm lighthouse
+
+      - name: Check outbound links
+        uses: lycheeverse/lychee-action@v2.9.0
+        with:
+          args: >-
+            --verbose --no-progress
+            --exclude '^/'
+            --exclude '^https://memo-web\.vercel\.app'
+            './dist/**/*.html'
+          fail: true
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore

@@ -42,10 +42,16 @@ const locales: readonly { code: Locale; label: string }[] = [
     }
 
     link.dataset.localeBound = "true";
-    link.addEventListener("click", () => {
+    const syncHash = () => {
       const target = new URL(link.href);
       target.hash = window.location.hash;
       link.href = target.href;
+    };
+
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    link.addEventListener("click", () => {
+      syncHash();
 
       const selectedLocale = link.dataset.locale;
       if (selectedLocale) {

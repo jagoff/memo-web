@@ -293,11 +293,10 @@ export async function initMotion(doc: Document = document): Promise<void> {
 
             gsap.fromTo(
               terminal,
-              { opacity: 0.38, y: 24 },
+              { y: 24 },
               {
                 duration: 0.8,
                 ease: "power2.out",
-                opacity: 1,
                 scrollTrigger: {
                   once: true,
                   start: "top 82%",

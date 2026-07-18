@@ -57,6 +57,7 @@ The implementation creates these focused units:
 ### Task 1: Bootstrap the static Astro project and quality toolchain
 
 **Files:**
+
 - Create: package.json
 - Create: pnpm-lock.yaml
 - Create: pnpm-workspace.yaml
@@ -74,6 +75,7 @@ The implementation creates these focused units:
 - Create: src/pages/es/index.astro
 
 **Interfaces:**
+
 - Consumes: the approved repository and route constraints.
 - Produces: pnpm scripts build, check, lint, format:check, test, test:e2e, test:a11y, test:visual, and lighthouse; valid static routes at / and /es/.
 
@@ -81,7 +83,7 @@ The implementation creates these focused units:
 
 Create package.json:
 
-~~~json
+```json
 {
   "name": "memo-web",
   "version": "0.1.0",
@@ -132,25 +134,25 @@ Create package.json:
     "vitest": "4.1.10"
   }
 }
-~~~
+```
 
 Create .node-version with exactly:
 
-~~~text
+```text
 24
-~~~
+```
 
 Create pnpm-workspace.yaml to allow only the native build scripts required by Astro:
 
-~~~yaml
+```yaml
 allowBuilds:
   esbuild: true
   sharp: true
-~~~
+```
 
 Create .gitignore:
 
-~~~gitignore
+```gitignore
 node_modules/
 dist/
 .astro/
@@ -161,11 +163,11 @@ coverage/
 playwright-report/
 test-results/
 .DS_Store
-~~~
+```
 
 Create astro.config.ts:
 
-~~~ts
+```ts
 import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
 
@@ -179,15 +181,15 @@ export default defineConfig({
     locales: ["en", "es"],
     routing: {
       prefixDefaultLocale: false,
-      redirectToDefaultLocale: false
-    }
-  }
+      redirectToDefaultLocale: false,
+    },
+  },
 });
-~~~
+```
 
 Create tsconfig.json:
 
-~~~json
+```json
 {
   "extends": "astro/tsconfigs/strictest",
   "compilerOptions": {
@@ -198,41 +200,48 @@ Create tsconfig.json:
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]
 }
-~~~
+```
 
 Create eslint.config.js with TypeScript coverage for both standalone files and Astro frontmatter:
 
-~~~js
+```js
 import eslintPluginAstro from "eslint-plugin-astro";
 import tseslint from "typescript-eslint";
 
 export default [
-  { ignores: ["dist/**", ".astro/**", "playwright-report/**", "test-results/**"] },
+  {
+    ignores: [
+      "dist/**",
+      ".astro/**",
+      "playwright-report/**",
+      "test-results/**",
+    ],
+  },
   ...tseslint.configs.recommended,
   ...eslintPluginAstro.configs.recommended,
   {
     files: ["**/*.astro"],
     languageOptions: {
       parserOptions: {
-        parser: tseslint.parser
-      }
-    }
-  }
+        parser: tseslint.parser,
+      },
+    },
+  },
 ];
-~~~
+```
 
 Create prettier.config.mjs:
 
-~~~js
+```js
 export default {
   plugins: ["prettier-plugin-astro"],
-  overrides: [{ files: "*.astro", options: { parser: "astro" } }]
+  overrides: [{ files: "*.astro", options: { parser: "astro" } }],
 };
-~~~
+```
 
 Create vitest.config.ts:
 
-~~~ts
+```ts
 /// <reference types="vitest/config" />
 
 import { getViteConfig } from "astro/config";
@@ -241,38 +250,38 @@ export default getViteConfig({
   test: {
     include: ["tests/**/*.test.ts"],
     exclude: ["tests/foundation/build-output.test.ts"],
-    coverage: { reporter: ["text", "html"] }
-  }
+    coverage: { reporter: ["text", "html"] },
+  },
 });
-~~~
+```
 
 Create vitest.build.config.ts:
 
-~~~ts
+```ts
 /// <reference types="vitest/config" />
 
 import { getViteConfig } from "astro/config";
 
 export default getViteConfig({
   test: {
-    include: ["tests/foundation/build-output.test.ts"]
-  }
+    include: ["tests/foundation/build-output.test.ts"],
+  },
 });
-~~~
+```
 
 Create src/env.d.ts:
 
-~~~ts
+```ts
 /// <reference types="astro/client" />
-~~~
+```
 
 - [ ] **Step 2: Install dependencies**
 
 Run:
 
-~~~bash
+```bash
 pnpm install
-~~~
+```
 
 Expected: pnpm-lock.yaml is created, esbuild/sharp are the only approved dependency build scripts, and the command exits 0.
 
@@ -280,7 +289,7 @@ Expected: pnpm-lock.yaml is created, esbuild/sharp are the only approved depende
 
 Create tests/foundation/routes.test.ts:
 
-~~~ts
+```ts
 import { existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -290,13 +299,13 @@ describe("localized route files", () => {
     expect(existsSync("src/pages/es/index.astro")).toBe(true);
   });
 });
-~~~
+```
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/foundation/routes.test.ts
-~~~
+```
 
 Expected: FAIL because both route files are absent.
 
@@ -304,54 +313,57 @@ Expected: FAIL because both route files are absent.
 
 Create src/pages/index.astro:
 
-~~~astro
+```astro
 ---
 const locale = "en";
 ---
+
 <!doctype html>
 <html lang={locale}>
   <head><meta charset="utf-8" /><title>memo</title></head>
   <body><main><h1>Your AI should remember.</h1></main></body>
 </html>
-~~~
+```
 
 Create src/pages/es/index.astro:
 
-~~~astro
+```astro
 ---
 const locale = "es";
 ---
+
 <!doctype html>
 <html lang={locale}>
   <head><meta charset="utf-8" /><title>memo</title></head>
   <body><main><h1>Tu IA debería recordar.</h1></main></body>
 </html>
-~~~
+```
 
 - [ ] **Step 5: Verify the foundation**
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/foundation/routes.test.ts
 pnpm check
 pnpm build
-~~~
+```
 
 Expected: one passing test, zero Astro/TypeScript errors, and dist/index.html plus dist/es/index.html.
 
 - [ ] **Step 6: Commit**
 
-~~~bash
+```bash
 git add package.json pnpm-lock.yaml pnpm-workspace.yaml .node-version .gitignore astro.config.ts tsconfig.json eslint.config.js prettier.config.mjs vitest.config.ts vitest.build.config.ts src tests
 git commit -m "chore: bootstrap Astro landing project"
-~~~
+```
 
 ---
 
 ### Task 2: Define typed bilingual copy and locale behavior
 
 **Files:**
+
 - Create: src/content/types.ts
 - Create: src/content/en.ts
 - Create: src/content/es.ts
@@ -360,6 +372,7 @@ git commit -m "chore: bootstrap Astro landing project"
 - Create: tests/i18n/routes.test.ts
 
 **Interfaces:**
+
 - Consumes: Locale values en and es.
 - Produces: type Locale, interface LandingCopy, CONTENT: Record<Locale, LandingCopy>, getCopy(locale), and localizedHref(locale, anchor).
 
@@ -367,7 +380,7 @@ git commit -m "chore: bootstrap Astro landing project"
 
 Create tests/i18n/content.test.ts:
 
-~~~ts
+```ts
 import { describe, expect, it } from "vitest";
 import { CONTENT } from "../../src/content";
 
@@ -376,14 +389,16 @@ describe("localized content", () => {
     expect(Object.keys(CONTENT.en)).toEqual(Object.keys(CONTENT.es));
     expect(CONTENT.en.features).toHaveLength(4);
     expect(CONTENT.es.features).toHaveLength(4);
-    expect(CONTENT.en.comparison.rows.length).toBe(CONTENT.es.comparison.rows.length);
+    expect(CONTENT.en.comparison.rows.length).toBe(
+      CONTENT.es.comparison.rows.length,
+    );
   });
 });
-~~~
+```
 
 Create tests/i18n/routes.test.ts:
 
-~~~ts
+```ts
 import { describe, expect, it } from "vitest";
 import { localizedHref } from "../../src/lib/i18n";
 
@@ -393,13 +408,13 @@ describe("localizedHref", () => {
     expect(localizedHref("es", "install")).toBe("/es/#install");
   });
 });
-~~~
+```
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/i18n
-~~~
+```
 
 Expected: FAIL because src/content and src/lib/i18n do not exist.
 
@@ -407,7 +422,7 @@ Expected: FAIL because src/content and src/lib/i18n do not exist.
 
 Create src/content/types.ts:
 
-~~~ts
+```ts
 export type Locale = "en" | "es";
 
 export interface FeatureCopy {
@@ -426,8 +441,20 @@ export interface ComparisonRow {
 export interface LandingCopy {
   meta: { title: string; description: string };
   nav: { how: string; features: string; install: string; github: string };
-  hero: { eyebrow: string; title: string; body: string; install: string; github: string };
-  problem: { eyebrow: string; title: string; body: string; lost: string; kept: string };
+  hero: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    install: string;
+    github: string;
+  };
+  problem: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    lost: string;
+    kept: string;
+  };
   loop: {
     eyebrow: string;
     title: string;
@@ -436,7 +463,13 @@ export interface LandingCopy {
   };
   featuresHeading: { eyebrow: string; title: string; body: string };
   features: readonly FeatureCopy[];
-  evidence: { eyebrow: string; title: string; body: string; illustration: string; updated: string };
+  evidence: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    illustration: string;
+    updated: string;
+  };
   install: {
     eyebrow: string;
     title: string;
@@ -456,61 +489,93 @@ export interface LandingCopy {
     rows: readonly ComparisonRow[];
     full: string;
   };
-  final: { eyebrow: string; title: string; body: string; install: string; github: string };
+  final: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    install: string;
+    github: string;
+  };
   footer: { source: string; pypi: string; license: string; by: string };
 }
-~~~
+```
 
 - [ ] **Step 3: Add complete English and Spanish content**
 
 Create src/content/en.ts and export an object satisfying LandingCopy with this exact approved copy:
 
-~~~ts
+```ts
 import type { LandingCopy } from "./types";
 
 export const en = {
   meta: {
     title: "memo — Local-first memory for AI agents",
-    description: "Persistent semantic memory for every AI coding agent. Local, private, searchable, and stored as Markdown."
+    description:
+      "Persistent semantic memory for every AI coding agent. Local, private, searchable, and stored as Markdown.",
   },
-  nav: { how: "How it works", features: "Features", install: "Install", github: "GitHub" },
+  nav: {
+    how: "How it works",
+    features: "Features",
+    install: "Install",
+    github: "GitHub",
+  },
   hero: {
     eyebrow: "Local-first memory for AI",
     title: "Your AI should remember.",
     body: "Persistent semantic memory for every agent. Private, local, and yours.",
     install: "Install memo",
-    github: "View on GitHub"
+    github: "View on GitHub",
   },
   problem: {
     eyebrow: "Sessions end. Knowledge should not.",
     title: "Stop starting over.",
     body: "memo carries durable decisions, facts, and preferences into the next session before your agent answers.",
     lost: "A fresh agent reconstructs yesterday from scratch.",
-    kept: "A memo-aware agent starts with what already matters."
+    kept: "A memo-aware agent starts with what already matters.",
   },
   loop: {
     eyebrow: "One local loop",
     title: "Save once. Recall everywhere.",
     body: "Durable knowledge becomes readable Markdown, a hybrid index, and precise context for any MCP-aware agent.",
-    steps: ["Capture durable knowledge", "Index Markdown locally", "Recall it in the next session"]
+    steps: [
+      "Capture durable knowledge",
+      "Index Markdown locally",
+      "Recall it in the next session",
+    ],
   },
   featuresHeading: {
     eyebrow: "More than a vector store",
     title: "Memory with judgment.",
-    body: "memo knows when knowledge changed, where it came from, and which agent needs it."
+    body: "memo knows when knowledge changed, where it came from, and which agent needs it.",
   },
   features: [
-    { id: "time-machine", title: "Time-machine", body: "Rewind the corpus and ask what was known on any date." },
-    { id: "contradictions", title: "Contradiction radar", body: "Find stale decisions and resolve conflicts without erasing history." },
-    { id: "capture", title: "Auto-capture", body: "Extract durable insights from real work without constant remember commands." },
-    { id: "cross-agent", title: "Cross-agent continuity", body: "Claude Code, Codex, Cursor, Devin, and other MCP clients share one memory." }
+    {
+      id: "time-machine",
+      title: "Time-machine",
+      body: "Rewind the corpus and ask what was known on any date.",
+    },
+    {
+      id: "contradictions",
+      title: "Contradiction radar",
+      body: "Find stale decisions and resolve conflicts without erasing history.",
+    },
+    {
+      id: "capture",
+      title: "Auto-capture",
+      body: "Extract durable insights from real work without constant remember commands.",
+    },
+    {
+      id: "cross-agent",
+      title: "Cross-agent continuity",
+      body: "Claude Code, Codex, Cursor, Devin, and other MCP clients share one memory.",
+    },
   ],
   evidence: {
     eyebrow: "Smaller context. Stronger continuity.",
     title: "Useful memory, measurable.",
     body: "A compact MCP surface and tight recall budget reduce repeated model work while public project activity stays verifiable.",
     illustration: "Conceptual memory graph",
-    updated: "Public data updated"
+    updated: "Public data updated",
   },
   install: {
     eyebrow: "Runs on your machine",
@@ -521,7 +586,7 @@ export const en = {
     copy: "Copy command",
     copied: "Copied",
     copyFailed: "Copy failed. Select the command manually.",
-    docs: "Read full installation guide"
+    docs: "Read full installation guide",
   },
   comparison: {
     eyebrow: "Why memo",
@@ -529,72 +594,118 @@ export const en = {
     body: "A compact comparison; the repository contains the sourced capability matrix.",
     headers: ["Capability", "memo", "Cloud memory", "Vector store"],
     rows: [
-      { capability: "Local by default", memo: "Yes", cloud: "No", vector: "Sometimes" },
+      {
+        capability: "Local by default",
+        memo: "Yes",
+        cloud: "No",
+        vector: "Sometimes",
+      },
       { capability: "Time travel", memo: "Yes", cloud: "Rare", vector: "No" },
-      { capability: "Contradiction handling", memo: "Yes", cloud: "Partial", vector: "No" },
-      { capability: "Cross-agent recall", memo: "Yes", cloud: "Partial", vector: "Custom" }
+      {
+        capability: "Contradiction handling",
+        memo: "Yes",
+        cloud: "Partial",
+        vector: "No",
+      },
+      {
+        capability: "Cross-agent recall",
+        memo: "Yes",
+        cloud: "Partial",
+        vector: "Custom",
+      },
     ],
-    full: "See full sourced comparison"
+    full: "See full sourced comparison",
   },
   final: {
     eyebrow: "Your agents already learn",
     title: "Let them remember.",
     body: "Install memo once and give every session a durable starting point.",
     install: "Install memo",
-    github: "Star on GitHub"
+    github: "Star on GitHub",
   },
-  footer: { source: "Source", pypi: "PyPI", license: "MIT License", by: "Built by Fernando Ferrari" }
+  footer: {
+    source: "Source",
+    pypi: "PyPI",
+    license: "MIT License",
+    by: "Built by Fernando Ferrari",
+  },
 } satisfies LandingCopy;
-~~~
+```
 
 Create src/content/es.ts with the same structure:
 
-~~~ts
+```ts
 import type { LandingCopy } from "./types";
 
 export const es = {
   meta: {
     title: "memo — Memoria local para agentes de IA",
-    description: "Memoria semántica persistente para cada agente de programación. Local, privada, buscable y guardada como Markdown."
+    description:
+      "Memoria semántica persistente para cada agente de programación. Local, privada, buscable y guardada como Markdown.",
   },
-  nav: { how: "Cómo funciona", features: "Funciones", install: "Instalar", github: "GitHub" },
+  nav: {
+    how: "Cómo funciona",
+    features: "Funciones",
+    install: "Instalar",
+    github: "GitHub",
+  },
   hero: {
     eyebrow: "Memoria local para IA",
     title: "Tu IA debería recordar.",
     body: "Memoria semántica persistente para cada agente. Privada, local y tuya.",
     install: "Instalar memo",
-    github: "Ver en GitHub"
+    github: "Ver en GitHub",
   },
   problem: {
     eyebrow: "Las sesiones terminan. El conocimiento no debería.",
     title: "Dejá de empezar de cero.",
     body: "memo lleva decisiones, hechos y preferencias durables a la próxima sesión antes de que tu agente responda.",
     lost: "Un agente nuevo reconstruye desde cero lo de ayer.",
-    kept: "Un agente con memo empieza por lo que ya importa."
+    kept: "Un agente con memo empieza por lo que ya importa.",
   },
   loop: {
     eyebrow: "Un ciclo completamente local",
     title: "Guardá una vez. Recordá en todas partes.",
     body: "El conocimiento durable se convierte en Markdown legible, un índice híbrido y contexto preciso para cualquier agente MCP.",
-    steps: ["Capturá conocimiento durable", "Indexá Markdown localmente", "Recuperalo en la próxima sesión"]
+    steps: [
+      "Capturá conocimiento durable",
+      "Indexá Markdown localmente",
+      "Recuperalo en la próxima sesión",
+    ],
   },
   featuresHeading: {
     eyebrow: "Mucho más que una base vectorial",
     title: "Memoria con criterio.",
-    body: "memo sabe cuándo cambió el conocimiento, de dónde vino y qué agente lo necesita."
+    body: "memo sabe cuándo cambió el conocimiento, de dónde vino y qué agente lo necesita.",
   },
   features: [
-    { id: "time-machine", title: "Máquina del tiempo", body: "Rebobiná el corpus y preguntá qué se sabía en cualquier fecha." },
-    { id: "contradictions", title: "Radar de contradicciones", body: "Encontrá decisiones obsoletas y resolvé conflictos sin borrar la historia." },
-    { id: "capture", title: "Captura automática", body: "Extraé aprendizajes durables del trabajo real sin comandos constantes." },
-    { id: "cross-agent", title: "Continuidad entre agentes", body: "Claude Code, Codex, Cursor, Devin y otros clientes MCP comparten una memoria." }
+    {
+      id: "time-machine",
+      title: "Máquina del tiempo",
+      body: "Rebobiná el corpus y preguntá qué se sabía en cualquier fecha.",
+    },
+    {
+      id: "contradictions",
+      title: "Radar de contradicciones",
+      body: "Encontrá decisiones obsoletas y resolvé conflictos sin borrar la historia.",
+    },
+    {
+      id: "capture",
+      title: "Captura automática",
+      body: "Extraé aprendizajes durables del trabajo real sin comandos constantes.",
+    },
+    {
+      id: "cross-agent",
+      title: "Continuidad entre agentes",
+      body: "Claude Code, Codex, Cursor, Devin y otros clientes MCP comparten una memoria.",
+    },
   ],
   evidence: {
     eyebrow: "Menos contexto. Más continuidad.",
     title: "Memoria útil, medible.",
     body: "Una superficie MCP compacta y un presupuesto de recall ajustado reducen trabajo repetido mientras la actividad pública sigue siendo verificable.",
     illustration: "Grafo conceptual de memoria",
-    updated: "Datos públicos actualizados"
+    updated: "Datos públicos actualizados",
   },
   install: {
     eyebrow: "Corre en tu máquina",
@@ -605,7 +716,7 @@ export const es = {
     copy: "Copiar comando",
     copied: "Copiado",
     copyFailed: "No se pudo copiar. Seleccioná el comando manualmente.",
-    docs: "Leer guía completa de instalación"
+    docs: "Leer guía completa de instalación",
   },
   comparison: {
     eyebrow: "Por qué memo",
@@ -613,40 +724,65 @@ export const es = {
     body: "Una comparación compacta; el repositorio contiene la matriz completa con fuentes.",
     headers: ["Capacidad", "memo", "Memoria cloud", "Base vectorial"],
     rows: [
-      { capability: "Local por defecto", memo: "Sí", cloud: "No", vector: "A veces" },
-      { capability: "Viaje en el tiempo", memo: "Sí", cloud: "Raro", vector: "No" },
-      { capability: "Contradicciones", memo: "Sí", cloud: "Parcial", vector: "No" },
-      { capability: "Recall entre agentes", memo: "Sí", cloud: "Parcial", vector: "A medida" }
+      {
+        capability: "Local por defecto",
+        memo: "Sí",
+        cloud: "No",
+        vector: "A veces",
+      },
+      {
+        capability: "Viaje en el tiempo",
+        memo: "Sí",
+        cloud: "Raro",
+        vector: "No",
+      },
+      {
+        capability: "Contradicciones",
+        memo: "Sí",
+        cloud: "Parcial",
+        vector: "No",
+      },
+      {
+        capability: "Recall entre agentes",
+        memo: "Sí",
+        cloud: "Parcial",
+        vector: "A medida",
+      },
     ],
-    full: "Ver comparación completa con fuentes"
+    full: "Ver comparación completa con fuentes",
   },
   final: {
     eyebrow: "Tus agentes ya aprenden",
     title: "Dejalos recordar.",
     body: "Instalá memo una vez y dale a cada sesión un punto de partida durable.",
     install: "Instalar memo",
-    github: "Dar una estrella en GitHub"
+    github: "Dar una estrella en GitHub",
   },
-  footer: { source: "Código", pypi: "PyPI", license: "Licencia MIT", by: "Creado por Fernando Ferrari" }
+  footer: {
+    source: "Código",
+    pypi: "PyPI",
+    license: "Licencia MIT",
+    by: "Creado por Fernando Ferrari",
+  },
 } satisfies LandingCopy;
-~~~
+```
 
 Create src/content/index.ts:
 
-~~~ts
+```ts
 import { en } from "./en";
 import { es } from "./es";
 import type { LandingCopy, Locale } from "./types";
 
 export const CONTENT: Record<Locale, LandingCopy> = { en, es };
 export type { LandingCopy, Locale };
-~~~
+```
 
 - [ ] **Step 4: Implement locale helpers**
 
 Create src/lib/i18n.ts:
 
-~~~ts
+```ts
 import { CONTENT, type LandingCopy, type Locale } from "../content";
 
 export function getCopy(locale: Locale): LandingCopy {
@@ -661,36 +797,38 @@ export function localizedHref(locale: Locale, anchor?: string): string {
 export function alternateLocale(locale: Locale): Locale {
   return locale === "en" ? "es" : "en";
 }
-~~~
+```
 
 - [ ] **Step 5: Verify and commit**
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/i18n
 pnpm check
-~~~
+```
 
 Expected: all i18n tests pass and TypeScript reports zero errors.
 
 Commit:
 
-~~~bash
+```bash
 git add src/content src/lib/i18n.ts tests/i18n
 git commit -m "feat: add typed bilingual landing content"
-~~~
+```
 
 ---
 
 ### Task 3: Add validated public data with snapshot fallback
 
 **Files:**
+
 - Create: src/data/project-snapshot.json
 - Create: src/lib/project-data.ts
 - Create: tests/data/project-data.test.ts
 
 **Interfaces:**
+
 - Consumes: GitHub repository and release JSON, PyPI package JSON, and ProjectData snapshot.
 - Produces: ProjectData, ProjectDataResult, ProjectDataSchema, loadProjectData(options).
 
@@ -698,47 +836,75 @@ git commit -m "feat: add typed bilingual landing content"
 
 Create tests/data/project-data.test.ts with two cases: valid remote responses return stale false; a fetcher that always throws returns the supplied valid snapshot with stale true. Use a fixed now function returning 2026-07-17T20:00:00.000Z.
 
-~~~ts
+```ts
 import { describe, expect, it, vi } from "vitest";
 import { loadProjectData, type ProjectData } from "../../src/lib/project-data";
 
 const snapshot: ProjectData = {
   stars: 6,
   forks: 2,
-  latestRelease: { tag: "v3.7.0", publishedAt: "2026-07-16T03:56:09Z", url: "https://github.com/jagoff/memo/releases/tag/v3.7.0" },
-  releases: [{ tag: "v3.7.0", publishedAt: "2026-07-16T03:56:09Z", url: "https://github.com/jagoff/memo/releases/tag/v3.7.0" }],
+  latestRelease: {
+    tag: "v3.7.0",
+    publishedAt: "2026-07-16T03:56:09Z",
+    url: "https://github.com/jagoff/memo/releases/tag/v3.7.0",
+  },
+  releases: [
+    {
+      tag: "v3.7.0",
+      publishedAt: "2026-07-16T03:56:09Z",
+      url: "https://github.com/jagoff/memo/releases/tag/v3.7.0",
+    },
+  ],
   pypiVersion: "3.7.0",
   pypiUrl: "https://pypi.org/project/mlx-memo/",
-  updatedAt: "2026-07-17T19:00:00.000Z"
+  updatedAt: "2026-07-17T19:00:00.000Z",
 };
 
 describe("loadProjectData", () => {
   it("uses validated remote data", async () => {
     const fetcher = vi.fn(async (url: RequestInfo | URL) => {
       const value = String(url);
-      if (value.endsWith("/releases?per_page=5")) return new Response(JSON.stringify([snapshot.latestRelease]));
-      if (value.includes("pypi.org")) return new Response(JSON.stringify({ info: { version: "3.7.1", package_url: snapshot.pypiUrl } }));
-      return new Response(JSON.stringify({ stargazers_count: 7, forks_count: 3 }));
+      if (value.endsWith("/releases?per_page=5"))
+        return new Response(JSON.stringify([snapshot.latestRelease]));
+      if (value.includes("pypi.org"))
+        return new Response(
+          JSON.stringify({
+            info: { version: "3.7.1", package_url: snapshot.pypiUrl },
+          }),
+        );
+      return new Response(
+        JSON.stringify({ stargazers_count: 7, forks_count: 3 }),
+      );
     });
-    const result = await loadProjectData({ fetcher, snapshot, now: () => new Date("2026-07-17T20:00:00.000Z") });
+    const result = await loadProjectData({
+      fetcher,
+      snapshot,
+      now: () => new Date("2026-07-17T20:00:00.000Z"),
+    });
     expect(result.stale).toBe(false);
     expect(result.data.stars).toBe(7);
     expect(result.data.pypiVersion).toBe("3.7.1");
   });
 
   it("falls back to the dated snapshot", async () => {
-    const fetcher = vi.fn(async () => { throw new Error("offline"); });
-    const result = await loadProjectData({ fetcher, snapshot, retryDelayMs: 0 });
+    const fetcher = vi.fn(async () => {
+      throw new Error("offline");
+    });
+    const result = await loadProjectData({
+      fetcher,
+      snapshot,
+      retryDelayMs: 0,
+    });
     expect(result).toEqual({ data: snapshot, stale: true });
   });
 });
-~~~
+```
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/data/project-data.test.ts
-~~~
+```
 
 Expected: FAIL because src/lib/project-data.ts does not exist.
 
@@ -746,7 +912,7 @@ Expected: FAIL because src/lib/project-data.ts does not exist.
 
 Create src/data/project-snapshot.json:
 
-~~~json
+```json
 {
   "stars": 6,
   "forks": 2,
@@ -771,13 +937,13 @@ Create src/data/project-snapshot.json:
   "pypiUrl": "https://pypi.org/project/mlx-memo/",
   "updatedAt": "2026-07-17T19:00:00.000Z"
 }
-~~~
+```
 
 - [ ] **Step 3: Implement schemas, retry, timeout, and fallback**
 
 Create src/lib/project-data.ts. Define ProjectDataSchema with Zod, infer ProjectData, and implement loadProjectData with this signature:
 
-~~~ts
+```ts
 export interface LoadProjectDataOptions {
   fetcher?: Fetcher;
   snapshot?: ProjectData;
@@ -791,10 +957,15 @@ export interface ProjectDataResult {
   stale: boolean;
 }
 
-export type Fetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+export type Fetcher = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) => Promise<Response>;
 
-export async function loadProjectData(options: LoadProjectDataOptions = {}): Promise<ProjectDataResult>
-~~~
+export async function loadProjectData(
+  options: LoadProjectDataOptions = {},
+): Promise<ProjectDataResult>;
+```
 
 The implementation must:
 
@@ -810,25 +981,26 @@ The implementation must:
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/data/project-data.test.ts
 pnpm check
-~~~
+```
 
 Expected: both tests pass and TypeScript reports zero errors.
 
 - [ ] **Step 5: Commit**
 
-~~~bash
+```bash
 git add src/data src/lib/project-data.ts tests/data
 git commit -m "feat: add resilient public project data"
-~~~
+```
 
 ---
 
 ### Task 4: Build the layout, SEO contract, visual tokens, and navigation
 
 **Files:**
+
 - Create: src/lib/seo.ts
 - Create: tests/seo/seo.test.ts
 - Create: src/styles/tokens.css
@@ -838,6 +1010,7 @@ git commit -m "feat: add resilient public project data"
 - Create: src/components/navigation/LocaleSwitch.astro
 
 **Interfaces:**
+
 - Consumes: Locale, LandingCopy.meta, localizedHref.
 - Produces: buildSeo(locale, meta), BaseLayout props { locale, meta }, keyboard-accessible header, locale switch preserving location.hash.
 
@@ -845,27 +1018,30 @@ git commit -m "feat: add resilient public project data"
 
 Create tests/seo/seo.test.ts:
 
-~~~ts
+```ts
 import { describe, expect, it } from "vitest";
 import { buildSeo } from "../../src/lib/seo";
 
 describe("buildSeo", () => {
   it("builds reciprocal canonical locale metadata", () => {
-    const seo = buildSeo("es", { title: "memo ES", description: "Memoria local" });
+    const seo = buildSeo("es", {
+      title: "memo ES",
+      description: "Memoria local",
+    });
     expect(seo.canonical).toBe("https://memo-web.vercel.app/es/");
     expect(seo.alternates).toEqual([
       { lang: "en", href: "https://memo-web.vercel.app/" },
-      { lang: "es", href: "https://memo-web.vercel.app/es/" }
+      { lang: "es", href: "https://memo-web.vercel.app/es/" },
     ]);
   });
 });
-~~~
+```
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/seo/seo.test.ts
-~~~
+```
 
 Expected: FAIL because src/lib/seo.ts does not exist.
 
@@ -873,7 +1049,7 @@ Expected: FAIL because src/lib/seo.ts does not exist.
 
 Create src/lib/seo.ts with:
 
-~~~ts
+```ts
 import type { LandingCopy, Locale } from "../content";
 
 const SITE = "https://memo-web.vercel.app";
@@ -885,18 +1061,18 @@ export function buildSeo(locale: Locale, meta: LandingCopy["meta"]) {
     canonical: SITE + path,
     alternates: [
       { lang: "en", href: SITE + "/" },
-      { lang: "es", href: SITE + "/es/" }
+      { lang: "es", href: SITE + "/es/" },
     ],
-    ogImage: SITE + "/og.jpg"
+    ogImage: SITE + "/og.jpg",
   };
 }
-~~~
+```
 
 - [ ] **Step 3: Create the complete global visual foundation**
 
 Create tokens.css with named color, type, spacing, radius, and shadow custom properties. Required exact core values:
 
-~~~css
+```css
 :root {
   --ink-950: #07050d;
   --ink-900: #0c0915;
@@ -917,33 +1093,100 @@ Create tokens.css with named color, type, spacing, radius, and shadow custom pro
   --radius-lg: 30px;
   --shadow-glow: 0 0 80px rgba(87, 221, 218, 0.12);
 }
-~~~
+```
 
 Create global.css. Import both variable fonts and tokens, then define box sizing, dark background, readable body defaults, fluid headings, focus-visible outline, skip-link behavior, shared container/eyebrow/button classes, and the reduced-motion rule:
 
-~~~css
+```css
 @import "@fontsource-variable/fraunces";
 @import "@fontsource-variable/geist";
 @import "./tokens.css";
 
-*, *::before, *::after { box-sizing: border-box; }
-html { color-scheme: dark; scroll-behavior: smooth; background: var(--ink-950); }
-body { margin: 0; min-width: 320px; color: var(--paper-50); background: var(--ink-950); font-family: var(--font-body); line-height: 1.6; }
-a { color: inherit; }
-button, a { -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 3px solid var(--signal-300); outline-offset: 4px; }
-.container { width: var(--content); margin-inline: auto; }
-.eyebrow { color: var(--signal-300); font: 700 0.75rem/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; }
-.display { margin: 0; font: 500 clamp(3.4rem, 8vw, 7.5rem)/0.9 var(--font-display); letter-spacing: -0.055em; text-wrap: balance; }
-.button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem; border: 1px solid var(--signal-300); border-radius: var(--radius-sm); text-decoration: none; font-weight: 750; }
-.button--primary { color: var(--ink-950); background: var(--signal-300); }
-.skip-link { position: fixed; z-index: 100; top: 0.75rem; left: 0.75rem; transform: translateY(-160%); }
-.skip-link:focus { transform: translateY(0); }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
-~~~
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  background: var(--ink-950);
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--paper-50);
+  background: var(--ink-950);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+a {
+  color: inherit;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+  outline: 3px solid var(--signal-300);
+  outline-offset: 4px;
+}
+.container {
+  width: var(--content);
+  margin-inline: auto;
+}
+.eyebrow {
+  color: var(--signal-300);
+  font: 700 0.75rem/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.display {
+  margin: 0;
+  font: 500 clamp(3.4rem, 8vw, 7.5rem)/0.9 var(--font-display);
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+.button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--signal-300);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 750;
+}
+.button--primary {
+  color: var(--ink-950);
+  background: var(--signal-300);
+}
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 0.75rem;
+  left: 0.75rem;
+  transform: translateY(-160%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
 
 - [ ] **Step 4: Implement BaseLayout and navigation**
 
@@ -955,27 +1198,28 @@ SiteHeader renders the memo logo text, anchors #how, #features, #install, the Gi
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/seo/seo.test.ts
 pnpm check
 pnpm lint
 pnpm format:check
-~~~
+```
 
 Expected: all commands exit 0.
 
 Commit:
 
-~~~bash
+```bash
 git add src/lib/seo.ts tests/seo src/styles src/layouts src/components/navigation
 git commit -m "feat: add layout navigation and SEO foundation"
-~~~
+```
 
 ---
 
 ### Task 5: Implement the hero, problem story, memory graph, and motion lifecycle
 
 **Files:**
+
 - Create: src/components/visualizations/MemoryGraph.astro
 - Create: src/components/sections/HeroSection.astro
 - Create: src/components/sections/ProblemSection.astro
@@ -984,6 +1228,7 @@ git commit -m "feat: add layout navigation and SEO foundation"
 - Create: tests/motion/preferences.test.ts
 
 **Interfaces:**
+
 - Consumes: LandingCopy.hero, LandingCopy.problem.
 - Produces: data-scene values hero and problem; prefersReducedMotion(matchMedia); idempotent initMotion().
 
@@ -991,7 +1236,7 @@ git commit -m "feat: add layout navigation and SEO foundation"
 
 Create tests/motion/preferences.test.ts:
 
-~~~ts
+```ts
 import { describe, expect, it } from "vitest";
 import { prefersReducedMotion } from "../../src/lib/motion-preferences";
 
@@ -1001,13 +1246,13 @@ describe("prefersReducedMotion", () => {
     expect(prefersReducedMotion(matchMedia)).toBe(true);
   });
 });
-~~~
+```
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/motion/preferences.test.ts
-~~~
+```
 
 Expected: FAIL because the module does not exist.
 
@@ -1015,13 +1260,15 @@ Expected: FAIL because the module does not exist.
 
 Create src/lib/motion-preferences.ts:
 
-~~~ts
+```ts
 export function prefersReducedMotion(
-  matchMedia: (query: string) => MediaQueryList = window.matchMedia.bind(window)
+  matchMedia: (query: string) => MediaQueryList = window.matchMedia.bind(
+    window,
+  ),
 ): boolean {
   return matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
-~~~
+```
 
 - [ ] **Step 3: Build the decorative memory graph**
 
@@ -1045,26 +1292,27 @@ Do not hide headings, body copy, CTAs, or cards. Only decorative SVG layers may 
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/motion/preferences.test.ts
 pnpm check
 pnpm build
-~~~
+```
 
 Expected: the test passes, type checking passes, and GSAP is emitted only in JavaScript bundles.
 
 Commit:
 
-~~~bash
+```bash
 git add src/components/visualizations/MemoryGraph.astro src/components/sections/HeroSection.astro src/components/sections/ProblemSection.astro src/scripts/motion.ts src/lib/motion-preferences.ts tests/motion
 git commit -m "feat: add hero memory graph and opening story"
-~~~
+```
 
 ---
 
 ### Task 6: Implement the memory loop, features, evidence, and SVG release chart
 
 **Files:**
+
 - Create: src/lib/charts.ts
 - Create: tests/charts/release-points.test.ts
 - Create: src/components/visualizations/RecallFlow.astro
@@ -1075,6 +1323,7 @@ git commit -m "feat: add hero memory graph and opening story"
 - Modify: src/scripts/motion.ts
 
 **Interfaces:**
+
 - Consumes: LandingCopy.loop, featuresHeading, features, evidence; ProjectDataResult.
 - Produces: releasePoints(releases, width, height), data-scene values loop/features/evidence.
 
@@ -1082,27 +1331,31 @@ git commit -m "feat: add hero memory graph and opening story"
 
 Create tests/charts/release-points.test.ts:
 
-~~~ts
+```ts
 import { describe, expect, it } from "vitest";
 import { releasePoints } from "../../src/lib/charts";
 
 describe("releasePoints", () => {
   it("orders releases chronologically inside the SVG bounds", () => {
-    const points = releasePoints([
-      { tag: "v2", publishedAt: "2026-07-16T00:00:00Z", url: "#" },
-      { tag: "v1", publishedAt: "2026-07-01T00:00:00Z", url: "#" }
-    ], 200, 80);
+    const points = releasePoints(
+      [
+        { tag: "v2", publishedAt: "2026-07-16T00:00:00Z", url: "#" },
+        { tag: "v1", publishedAt: "2026-07-01T00:00:00Z", url: "#" },
+      ],
+      200,
+      80,
+    );
     expect(points[0]?.tag).toBe("v1");
     expect(points.every((point) => point.x >= 12 && point.x <= 188)).toBe(true);
   });
 });
-~~~
+```
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/charts/release-points.test.ts
-~~~
+```
 
 Expected: FAIL because src/lib/charts.ts does not exist.
 
@@ -1110,7 +1363,7 @@ Expected: FAIL because src/lib/charts.ts does not exist.
 
 Create releasePoints with signature:
 
-~~~ts
+```ts
 import type { ProjectData } from "./project-data";
 
 export interface ReleasePoint {
@@ -1123,9 +1376,9 @@ export interface ReleasePoint {
 export function releasePoints(
   releases: ProjectData["releases"],
   width: number,
-  height: number
-): ReleasePoint[]
-~~~
+  height: number,
+): ReleasePoint[];
+```
 
 Sort copies of releases by publishedAt ascending. Use 12-pixel horizontal/vertical padding, spread x evenly, and alternate y between 35% and 70% of usable height. Return an empty array for no releases and the center point for one release.
 
@@ -1154,26 +1407,27 @@ All branches must return GSAP cleanup callbacks.
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/charts/release-points.test.ts
 pnpm check
 pnpm build
-~~~
+```
 
 Expected: all checks pass.
 
 Commit:
 
-~~~bash
+```bash
 git add src/lib/charts.ts tests/charts src/components/visualizations src/components/sections src/scripts/motion.ts
 git commit -m "feat: add product story and evidence visualizations"
-~~~
+```
 
 ---
 
 ### Task 7: Implement installation, comparison, final CTA, and clipboard enhancement
 
 **Files:**
+
 - Create: src/lib/clipboard.ts
 - Create: tests/interactions/clipboard.test.ts
 - Create: src/components/sections/InstallSection.astro
@@ -1183,6 +1437,7 @@ git commit -m "feat: add product story and evidence visualizations"
 - Create: src/scripts/interactions.ts
 
 **Interfaces:**
+
 - Consumes: LandingCopy.install, comparison, final, footer.
 - Produces: copyText(text, clipboard), data-platform tabs, accessible status updates.
 
@@ -1190,7 +1445,7 @@ git commit -m "feat: add product story and evidence visualizations"
 
 Create tests/interactions/clipboard.test.ts:
 
-~~~ts
+```ts
 import { describe, expect, it, vi } from "vitest";
 import { copyText } from "../../src/lib/clipboard";
 
@@ -1201,17 +1456,19 @@ describe("copyText", () => {
   });
 
   it("returns false after a rejected write", async () => {
-    const writeText = vi.fn(async () => { throw new Error("denied"); });
+    const writeText = vi.fn(async () => {
+      throw new Error("denied");
+    });
     expect(await copyText("memo", { writeText })).toBe(false);
   });
 });
-~~~
+```
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/interactions/clipboard.test.ts
-~~~
+```
 
 Expected: FAIL because src/lib/clipboard.ts does not exist.
 
@@ -1219,12 +1476,15 @@ Expected: FAIL because src/lib/clipboard.ts does not exist.
 
 Create src/lib/clipboard.ts:
 
-~~~ts
+```ts
 export interface ClipboardWriter {
   writeText(text: string): Promise<void>;
 }
 
-export async function copyText(text: string, clipboard: ClipboardWriter): Promise<boolean> {
+export async function copyText(
+  text: string,
+  clipboard: ClipboardWriter,
+): Promise<boolean> {
   try {
     await clipboard.writeText(text);
     return true;
@@ -1232,16 +1492,16 @@ export async function copyText(text: string, clipboard: ClipboardWriter): Promis
     return false;
   }
 }
-~~~
+```
 
 - [ ] **Step 3: Build the closing sections**
 
 InstallSection uses these exact commands:
 
-~~~text
+```text
 macOS: curl -fsSL https://raw.githubusercontent.com/jagoff/memo/master/install.sh | bash
 Linux: pipx install "mlx-memo[cpu]"
-~~~
+```
 
 Render both commands in the HTML so no-JavaScript visitors can read them. Use progressively enhanced tabs to change emphasis, not to remove content. Each copy button carries data-copy, data-success, and data-failure strings; the status element has role="status" and aria-live="polite".
 
@@ -1263,26 +1523,27 @@ All event binding is idempotent via data-bound attributes.
 
 Run:
 
-~~~bash
+```bash
 pnpm test tests/interactions/clipboard.test.ts
 pnpm check
 pnpm build
-~~~
+```
 
 Expected: all checks pass.
 
 Commit:
 
-~~~bash
+```bash
 git add src/lib/clipboard.ts tests/interactions src/components/sections src/components/SiteFooter.astro src/scripts/interactions.ts
 git commit -m "feat: add install flow comparison and final CTA"
-~~~
+```
 
 ---
 
 ### Task 8: Compose both localized pages and static metadata assets
 
 **Files:**
+
 - Create: src/components/LandingPage.astro
 - Modify: src/pages/index.astro
 - Modify: src/pages/es/index.astro
@@ -1294,6 +1555,7 @@ git commit -m "feat: add install flow comparison and final CTA"
 - Test: tests/foundation/build-output.test.ts
 
 **Interfaces:**
+
 - Consumes: getCopy, loadProjectData, BaseLayout, all section components.
 - Produces: complete /, /es/, /404.html, /robots.txt, /sitemap-index.xml, first-party brand assets.
 
@@ -1303,9 +1565,9 @@ Create tests/foundation/build-output.test.ts. Read dist output after build and a
 
 Run:
 
-~~~bash
+```bash
 pnpm test:build
-~~~
+```
 
 Expected: FAIL because the composed metadata and sections are absent.
 
@@ -1330,11 +1592,11 @@ Wrap the composition in BaseLayout and main id main-content. Do not duplicate se
 
 index.astro renders LandingPage locale="en"; es/index.astro renders LandingPage locale="es". The 404 page uses BaseLayout with a bilingual message and direct links to / and /es/. robots.txt.ts returns:
 
-~~~text
+```text
 User-agent: *
 Allow: /
 Sitemap: https://memo-web.vercel.app/sitemap-index.xml
-~~~
+```
 
 - [ ] **Step 4: Add first-party assets**
 
@@ -1344,25 +1606,26 @@ Copy /Users/fer/repos/memo/docs/logo.svg to public/logo.svg and public/favicon.s
 
 Run:
 
-~~~bash
+```bash
 pnpm test:build
 pnpm check
-~~~
+```
 
 Expected: the build-output test passes and all static routes/assets exist.
 
 Commit:
 
-~~~bash
+```bash
 git add src/components/LandingPage.astro src/pages public tests/foundation/build-output.test.ts
 git commit -m "feat: compose bilingual production landing pages"
-~~~
+```
 
 ---
 
 ### Task 9: Add end-to-end, accessibility, visual, bundle, and Lighthouse gates
 
 **Files:**
+
 - Create: playwright.config.ts
 - Create: e2e/site.spec.ts
 - Create: e2e/accessibility.spec.ts
@@ -1373,6 +1636,7 @@ git commit -m "feat: compose bilingual production landing pages"
 - Create: .github/workflows/ci.yml
 
 **Interfaces:**
+
 - Consumes: production static build.
 - Produces: deterministic CI gates for behavior, axe, screenshots, links, JavaScript gzip size, and Lighthouse budgets.
 
@@ -1395,10 +1659,10 @@ site.spec.ts must assert:
 
 Run:
 
-~~~bash
+```bash
 pnpm exec playwright install chromium webkit
 pnpm test:e2e
-~~~
+```
 
 Expected on the first run: at least one failure that exposes missing behavior; fix the owning component/script, rerun, and reach all passing.
 
@@ -1408,9 +1672,9 @@ accessibility.spec.ts visits / and /es/ at desktop and mobile widths, injects Ax
 
 Run:
 
-~~~bash
+```bash
 pnpm test:a11y
-~~~
+```
 
 Expected: zero axe violations and passing keyboard assertions.
 
@@ -1418,10 +1682,10 @@ Expected: zero axe violations and passing keyboard assertions.
 
 visual.spec.ts emulates reduced motion, waits for fonts, visits both locales, and captures full-page screenshots at 1440x1000 and 390x844 with maxDiffPixelRatio 0.02. Mask the updated date only. Generate and inspect baseline snapshots once:
 
-~~~bash
+```bash
 pnpm test:visual --update-snapshots
 pnpm test:visual
-~~~
+```
 
 Expected: second run passes with no visual diff.
 
@@ -1431,10 +1695,10 @@ Create scripts/check-bundle-size.mjs. Recursively find dist/**/*.js, gzip each u
 
 Run:
 
-~~~bash
+```bash
 pnpm build
 pnpm budget
-~~~
+```
 
 Expected: output includes JavaScript gzip total: N bytes and exits 0 below 122880.
 
@@ -1451,10 +1715,10 @@ Create lighthouserc.json with staticDistDir dist, three runs, and assertions:
 
 Run:
 
-~~~bash
+```bash
 pnpm build
 pnpm lighthouse
-~~~
+```
 
 Expected: all assertions pass for / and /es/.
 
@@ -1466,7 +1730,7 @@ The GitHub Actions workflow uses ubuntu-latest, actions/checkout@v7, Node 24, pn
 
 Run:
 
-~~~bash
+```bash
 pnpm format
 pnpm format:check
 pnpm lint
@@ -1479,28 +1743,30 @@ pnpm test:e2e
 pnpm test:a11y
 pnpm test:visual
 pnpm lighthouse
-~~~
+```
 
 Expected: every command exits 0.
 
 Commit:
 
-~~~bash
+```bash
 git add playwright.config.ts e2e scripts/check-bundle-size.mjs lighthouserc.json .github
 git commit -m "test: add production quality gates"
-~~~
+```
 
 ---
 
 ### Task 10: Document, publish, connect Vercel, and verify production
 
 **Files:**
+
 - Create: README.md
 - Create: LICENSE
 - Modify: src/data/project-snapshot.json only if a final refresh returns newer valid public data.
 - Generated and ignored: .vercel/
 
 **Interfaces:**
+
 - Consumes: passing Task 9 gate and authenticated jagoff GitHub account.
 - Produces: public jagoff/memo-web repository, connected Vercel Hobby project, production URL, and automatic main-branch deployment.
 
@@ -1514,7 +1780,7 @@ Copy /Users/fer/repos/memo/LICENSE to LICENSE so the website code uses the same 
 
 Run:
 
-~~~bash
+```bash
 pnpm format
 pnpm format:check
 pnpm lint
@@ -1528,33 +1794,33 @@ pnpm test:a11y
 pnpm test:visual
 pnpm lighthouse
 git status --short
-~~~
+```
 
 Expected: all checks pass; git status shows only README.md and LICENSE before the documentation commit.
 
 - [ ] **Step 3: Commit documentation**
 
-~~~bash
+```bash
 git add README.md LICENSE
 git commit -m "docs: add project usage and license"
-~~~
+```
 
 - [ ] **Step 4: Create and push the public GitHub repository**
 
 Confirm the name is still free:
 
-~~~bash
+```bash
 gh repo view jagoff/memo-web
-~~~
+```
 
 Expected: GraphQL could not resolve the repository.
 
 Create and push:
 
-~~~bash
+```bash
 gh repo create jagoff/memo-web --public --source=. --remote=origin --push --description "Neural editorial landing page for memo — local-first memory for AI agents"
 gh repo view jagoff/memo-web --json url,visibility,defaultBranchRef
-~~~
+```
 
 Expected: visibility PUBLIC, default branch main, and URL https://github.com/jagoff/memo-web.
 
@@ -1562,11 +1828,11 @@ Expected: visibility PUBLIC, default branch main, and URL https://github.com/jag
 
 The current local Vercel token is invalid. Run:
 
-~~~bash
+```bash
 npx vercel@56.3.1 logout
 npx vercel@56.3.1 login
 npx vercel@56.3.1 whoami
-~~~
+```
 
 Expected: browser/email authentication completes and whoami prints the owner's personal Vercel username. Do not select, create, trial, or upgrade to a Pro team.
 
@@ -1574,11 +1840,11 @@ Expected: browser/email authentication completes and whoami prints the owner's p
 
 Run:
 
-~~~bash
+```bash
 npx vercel@56.3.1 link --yes --project memo-web
 npx vercel@56.3.1 git connect https://github.com/jagoff/memo-web
 npx vercel@56.3.1 telemetry disable
-~~~
+```
 
 Expected: the local directory is linked to a personal Hobby project and Git integration points to jagoff/memo-web. If Vercel asks for payment or Pro, stop instead of accepting.
 
@@ -1586,9 +1852,9 @@ Expected: the local directory is linked to a personal Hobby project and Git inte
 
 Run:
 
-~~~bash
+```bash
 npx vercel@56.3.1 deploy --prod --yes
-~~~
+```
 
 Expected: a production URL. Prefer https://memo-web.vercel.app. If that project name is unavailable, rename the Vercel project to memo-memory, replace the exact string https://memo-web.vercel.app with https://memo-memory.vercel.app in astro.config.ts, src/lib/seo.ts, src/pages/robots.txt.ts, and tests/seo/seo.test.ts, rerun the complete gate, commit with message fix: align canonical production URL, and push before deploying.
 
@@ -1596,14 +1862,14 @@ Expected: a production URL. Prefer https://memo-web.vercel.app. If that project 
 
 For the actual production URL, run:
 
-~~~bash
+```bash
 curl -fsSI https://memo-web.vercel.app/
 curl -fsSI https://memo-web.vercel.app/es/
 curl -fsS https://memo-web.vercel.app/ | rg "Your AI should remember"
 curl -fsS https://memo-web.vercel.app/es/ | rg "Tu IA debería recordar"
 gh run list --repo jagoff/memo-web --limit 5
 git status --short --branch
-~~~
+```
 
 Expected: both routes return HTTP 200, both localized strings match, the latest CI run is successful, and the local branch is clean and aligned with origin/main.
 

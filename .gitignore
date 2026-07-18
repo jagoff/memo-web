@@ -5,6 +5,7 @@ dist/
 .worktrees/
 .superpowers/
 coverage/
+.lighthouseci/
 playwright-report/
 test-results/
 .DS_Store

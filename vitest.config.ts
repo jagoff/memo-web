@@ -6,6 +6,6 @@ export default getViteConfig({
   test: {
     include: ["tests/**/*.test.ts"],
     exclude: ["tests/foundation/build-output.test.ts"],
-    coverage: { reporter: ["text", "html"] }
-  }
+    coverage: { reporter: ["text", "html"] },
+  },
 });
