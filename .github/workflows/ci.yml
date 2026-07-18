@@ -70,7 +70,7 @@ jobs:
         with:
           args: >-
             --verbose --no-progress
-            --exclude '^/'
+            --root-dir './dist'
             --exclude '^https://memo-web-sigma\.vercel\.app'
             './dist/**/*.html'
           fail: true
