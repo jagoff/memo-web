@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 
 import { describe, expect, it } from "vitest";
 
-const SITE = "https://memo-memory.vercel.app";
+const SITE = "https://memo-web-sigma.vercel.app";
 
 async function readLandingPage(locale: "en" | "es"): Promise<string> {
   const path = locale === "en" ? "dist/index.html" : "dist/es/index.html";

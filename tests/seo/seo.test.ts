@@ -7,10 +7,10 @@ describe("buildSeo", () => {
       title: "memo ES",
       description: "Memoria local",
     });
-    expect(seo.canonical).toBe("https://memo-memory.vercel.app/es/");
+    expect(seo.canonical).toBe("https://memo-web-sigma.vercel.app/es/");
     expect(seo.alternates).toEqual([
-      { lang: "en", href: "https://memo-memory.vercel.app/" },
-      { lang: "es", href: "https://memo-memory.vercel.app/es/" },
+      { lang: "en", href: "https://memo-web-sigma.vercel.app/" },
+      { lang: "es", href: "https://memo-web-sigma.vercel.app/es/" },
     ]);
   });
 });

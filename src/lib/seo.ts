@@ -1,6 +1,6 @@
 import type { LandingCopy, Locale } from "../content";
 
-const SITE = "https://memo-memory.vercel.app";
+const SITE = "https://memo-web-sigma.vercel.app";
 
 export function buildSeo(locale: Locale, meta: LandingCopy["meta"]) {
   const path = locale === "en" ? "/" : "/es/";
