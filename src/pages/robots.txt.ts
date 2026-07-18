@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 
 const ROBOTS = `User-agent: *
 Allow: /
-Sitemap: https://memo-web.vercel.app/sitemap-index.xml
+Sitemap: https://memo-memory.vercel.app/sitemap-index.xml
 `;
 
 export const GET: APIRoute = () =>

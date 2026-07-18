@@ -71,7 +71,7 @@ jobs:
           args: >-
             --verbose --no-progress
             --exclude '^/'
-            --exclude '^https://memo-web\.vercel\.app'
+            --exclude '^https://memo-memory\.vercel\.app'
             './dist/**/*.html'
           fail: true
 

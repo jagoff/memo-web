@@ -2,7 +2,7 @@ import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://memo-web.vercel.app",
+  site: "https://memo-memory.vercel.app",
   output: "static",
   trailingSlash: "always",
   integrations: [sitemap()],
