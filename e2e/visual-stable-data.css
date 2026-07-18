@@ -1,0 +1,7 @@
+/*
+ * Public-data fallback is behavior-tested independently. Keep visual baselines
+ * stable whether the build-time GitHub request succeeds or uses the snapshot.
+ */
+[data-public-data-stale] {
+  display: none !important;
+}

@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
 
 test.skip(
@@ -15,6 +16,10 @@ const viewports = [
   { name: "mobile", width: 390, height: 844 },
 ] as const;
 
+const stableDataStyle = fileURLToPath(
+  new URL("./visual-stable-data.css", import.meta.url),
+);
+
 for (const locale of locales) {
   for (const viewport of viewports) {
     test(`${locale.name} ${viewport.name} landing page`, async ({ page }) => {
@@ -31,6 +36,7 @@ for (const locale of locales) {
           fullPage: true,
           mask: [page.locator("[data-public-data-freshness] time")],
           maxDiffPixelRatio: 0.02,
+          stylePath: stableDataStyle,
         },
       );
     });
