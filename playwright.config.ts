@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: "html",
   snapshotPathTemplate:
-    "{testDir}/{testFilePath}-snapshots/{projectName}/{arg}{ext}",
+    "{testDir}/{testFilePath}-snapshots/{projectName}-{platform}/{arg}{ext}",
   use: {
     baseURL: "http://127.0.0.1:4321",
     screenshot: "only-on-failure",
