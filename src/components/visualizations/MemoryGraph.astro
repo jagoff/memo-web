@@ -1,4 +1,18 @@
-<div class="memory-graph" data-graph>
+---
+interface Props {
+  idPrefix?: string;
+}
+
+const { idPrefix = "memory-graph" } = Astro.props;
+const memoryBloomId = `${idPrefix}-memory-bloom`;
+const nodeBloomId = `${idPrefix}-node-bloom`;
+---
+
+<div
+  class="memory-graph"
+  data-graph
+  style={`--memory-bloom: url(#${memoryBloomId}); --node-bloom: url(#${nodeBloomId});`}
+>
   <svg
     viewBox="0 0 640 640"
     aria-hidden="true"
@@ -6,14 +20,14 @@
     role="presentation"
   >
     <defs>
-      <radialGradient id="memory-bloom" cx="50%" cy="50%" r="50%">
+      <radialGradient id={memoryBloomId} cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="var(--violet-400)" stop-opacity="0.26"
         ></stop>
         <stop offset="48%" stop-color="var(--violet-700)" stop-opacity="0.12"
         ></stop>
         <stop offset="100%" stop-color="var(--ink-950)" stop-opacity="0"></stop>
       </radialGradient>
-      <filter id="node-bloom" x="-120%" y="-120%" width="340%" height="340%">
+      <filter id={nodeBloomId} x="-120%" y="-120%" width="340%" height="340%">
         <feGaussianBlur stdDeviation="6" result="blur"></feGaussianBlur>
         <feMerge>
           <feMergeNode in="blur"></feMergeNode>
@@ -77,7 +91,7 @@
   }
 
   .graph-backdrop {
-    fill: url("#memory-bloom");
+    fill: var(--memory-bloom);
   }
 
   .graph-edge {
@@ -88,7 +102,7 @@
 
   .graph-node {
     fill: var(--signal-300);
-    filter: url("#node-bloom");
+    filter: var(--node-bloom);
     stroke: color-mix(in srgb, var(--paper-50) 72%, transparent);
     stroke-width: 1;
     transform-box: fill-box;
@@ -97,7 +111,7 @@
 
   .memo-mark {
     fill: none;
-    filter: url("#node-bloom");
+    filter: var(--node-bloom);
     stroke: var(--paper-50);
     stroke-linecap: round;
     stroke-linejoin: round;

@@ -1,0 +1,45 @@
+---
+import type { Locale } from "../content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCopy } from "../lib/i18n";
+import { loadProjectData } from "../lib/project-data";
+import SiteFooter from "./SiteFooter.astro";
+import SiteHeader from "./navigation/SiteHeader.astro";
+import ComparisonSection from "./sections/ComparisonSection.astro";
+import EvidenceSection from "./sections/EvidenceSection.astro";
+import FeatureRail from "./sections/FeatureRail.astro";
+import FinalCTA from "./sections/FinalCTA.astro";
+import HeroSection from "./sections/HeroSection.astro";
+import InstallSection from "./sections/InstallSection.astro";
+import MemoryLoopSection from "./sections/MemoryLoopSection.astro";
+import ProblemSection from "./sections/ProblemSection.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getCopy(locale);
+const projectData = await loadProjectData();
+---
+
+<BaseLayout {locale} meta={copy.meta}>
+  <SiteHeader slot="header" {locale} copy={copy.nav} />
+
+  <main id="main-content">
+    <HeroSection copy={copy.hero} />
+    <ProblemSection copy={copy.problem} />
+    <MemoryLoopSection id="how" copy={copy.loop} />
+    <FeatureRail
+      id="features"
+      copy={copy.featuresHeading}
+      features={copy.features}
+    />
+    <EvidenceSection {locale} copy={copy.evidence} {projectData} />
+    <InstallSection id="install" copy={copy.install} />
+    <ComparisonSection copy={copy.comparison} />
+    <FinalCTA copy={copy.final} />
+  </main>
+
+  <SiteFooter copy={copy.footer} />
+</BaseLayout>

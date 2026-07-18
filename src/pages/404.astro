@@ -1,0 +1,63 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const meta = {
+  title: "404 — Page not found | Página no encontrada | memo",
+  description:
+    "This memo page could not be found. Esta página de memo no existe.",
+};
+---
+
+<BaseLayout locale="en" {meta}>
+  <main id="main-content" class="not-found">
+    <p class="eyebrow">404</p>
+    <h1>Page not found / Página no encontrada</h1>
+    <p>
+      Choose a language to return home. Elegí un idioma para volver al inicio.
+    </p>
+    <nav aria-label="Landing pages">
+      <a class="button button--primary" href="/">English</a>
+      <a class="button button--secondary" href="/es/" lang="es">Español</a>
+    </nav>
+  </main>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    min-height: 100svh;
+    align-content: center;
+    justify-items: start;
+    gap: var(--space-6);
+    width: min(100% - 40px, 56rem);
+    margin-inline: auto;
+  }
+
+  .not-found :global(h1),
+  .not-found :global(p) {
+    margin: 0;
+  }
+
+  .not-found :global(h1) {
+    font: 500 clamp(3rem, 9vw, 7rem) / 0.95 var(--font-display);
+    letter-spacing: -0.05em;
+  }
+
+  .not-found > :global(p:last-of-type) {
+    max-width: 42rem;
+    color: var(--paper-200);
+    font-size: clamp(1rem, 2vw, 1.25rem);
+  }
+
+  .not-found :global(nav) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .button--secondary {
+    border-color: color-mix(in srgb, var(--paper-200) 34%, transparent);
+    color: var(--paper-50);
+    background: color-mix(in srgb, var(--ink-800) 72%, transparent);
+  }
+</style>
