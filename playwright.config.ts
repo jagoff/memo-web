@@ -24,7 +24,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm build && pnpm preview --host 127.0.0.1",
+    command:
+      "corepack pnpm build && corepack pnpm preview --host 127.0.0.1",
     url: "http://127.0.0.1:4321",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
