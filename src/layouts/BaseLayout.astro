@@ -1,4 +1,6 @@
 ---
+import Analytics from "@vercel/analytics/astro";
+
 import type { LandingCopy, Locale } from "../content";
 import { buildSeo } from "../lib/seo";
 import "../styles/global.css";
@@ -76,6 +78,7 @@ const structuredData = JSON.stringify({
     >
     <slot name="header" />
     <slot />
+    <Analytics />
 
     <script>
       import.meta.glob(["../scripts/interactions.ts", "../scripts/motion.ts"], {

@@ -30,4 +30,13 @@ describe("production landing page output", () => {
       expect(new Set(ids).size).toBe(ids.length);
     },
   );
+
+  it.each(["en", "es"] as const)(
+    "includes Vercel Web Analytics on the %s page",
+    async (locale) => {
+      const html = await readLandingPage(locale);
+
+      expect(html).toContain("/_vercel/insights/script.js");
+    },
+  );
 });
