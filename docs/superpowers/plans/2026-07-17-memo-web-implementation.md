@@ -91,7 +91,7 @@ Create package.json:
   "type": "module",
   "packageManager": "pnpm@11.12.0",
   "engines": {
-    "node": "^22.13.0 || >=24 <27"
+    "node": "^22.22.3 || ^24.16.0 || >=26.3.0 <27"
   },
   "scripts": {
     "dev": "astro dev",

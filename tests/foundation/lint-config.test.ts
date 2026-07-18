@@ -1,4 +1,5 @@
 import { ESLint } from "eslint";
+import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 describe("ESLint TypeScript coverage", () => {
@@ -18,5 +19,17 @@ describe("ESLint TypeScript coverage", () => {
 
     expect(result).toBeDefined();
     expect(result?.fatalErrorCount).toBe(0);
+  });
+});
+
+describe("package toolchain contract", () => {
+  it("advertises only Node versions supported by direct tooling", async () => {
+    const packageJson = JSON.parse(await readFile("package.json", "utf8")) as {
+      engines?: { node?: string };
+    };
+
+    expect(packageJson.engines?.node).toBe(
+      "^22.22.3 || ^24.16.0 || >=26.3.0 <27",
+    );
   });
 });
