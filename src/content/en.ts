@@ -2,20 +2,21 @@ import type { LandingCopy } from "./types";
 
 export const en = {
   meta: {
-    title: "memo — Local-first memory for AI agents",
+    title: "Persistent Memory for AI Agents, Local & Private | memo",
     description:
-      "Persistent semantic memory for every AI coding agent. Local, private, searchable, and stored as Markdown.",
+      "Give Claude Code, Codex, Cursor, and any MCP agent persistent semantic memory. memo runs locally, keeps data private, and stores knowledge as Markdown.",
   },
   nav: {
     how: "How it works",
     features: "Features",
+    faq: "FAQ",
     install: "Install",
     github: "GitHub",
   },
   hero: {
-    eyebrow: "Local-first memory for AI",
+    eyebrow: "Persistent memory for AI agents",
     title: "Your AI should remember.",
-    body: "Persistent semantic memory for every agent. Private, local, and yours.",
+    body: "Give Claude Code, Codex, Cursor, and every MCP agent persistent semantic memory. Private, local, searchable, and stored as readable Markdown.",
     install: "Install memo",
     github: "View on GitHub",
   },
@@ -108,6 +109,43 @@ export const en = {
       },
     ],
     full: "See full sourced comparison",
+  },
+  faq: {
+    eyebrow: "AI agent memory FAQ",
+    title: "Persistent AI memory, explained.",
+    body: "Straight answers about local storage, MCP compatibility, privacy, retrieval, and supported platforms.",
+    items: [
+      {
+        question: "What is memory for AI agents?",
+        answer:
+          "AI agent memory preserves useful knowledge beyond one chat or coding session. memo is an open-source MCP server that saves durable decisions, facts, and preferences so future sessions can reuse them.",
+      },
+      {
+        question: "Which AI coding agents work with memo?",
+        answer:
+          "memo works with MCP-aware clients including Claude Code, Codex, Cursor, Cline, Devin, OpenCode, and Continue. They can all use the same local memory store.",
+      },
+      {
+        question: "Is memo private and fully local?",
+        answer:
+          "Core save, search, recall, and indexing workflows run on your machine without a cloud account or API keys. Explicit actions such as installation, model downloads, updates, or a sync remote can use the network.",
+      },
+      {
+        question: "How does memo store and retrieve knowledge?",
+        answer:
+          "Plain Markdown files are the source of truth. memo builds a local, rebuildable index and combines semantic and keyword search with reranking to return focused context.",
+      },
+      {
+        question: "Does memory carry across agents and sessions?",
+        answer:
+          "Yes. Compatible agents connect through MCP and recall from one local knowledge base, so a decision saved in Claude Code can be available later in Codex, Cursor, or another client.",
+      },
+      {
+        question: "Can I run memo on macOS and Linux?",
+        answer:
+          "Yes. memo uses MLX on Apple Silicon and provides a CPU sentence-transformers backend for Linux, Ubuntu, and Intel Macs. Both installation options are shown above.",
+      },
+    ],
   },
   final: {
     eyebrow: "Your agents already learn",

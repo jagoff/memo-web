@@ -5,7 +5,14 @@ export default defineConfig({
   site: "https://memo-web-sigma.vercel.app",
   output: "static",
   trailingSlash: "always",
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      i18n: {
+        defaultLocale: "en",
+        locales: { en: "en", es: "es" },
+      },
+    }),
+  ],
   i18n: {
     defaultLocale: "en",
     locales: ["en", "es"],

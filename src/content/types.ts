@@ -13,9 +13,20 @@ export interface ComparisonRow {
   vector: string;
 }
 
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface LandingCopy {
   meta: { title: string; description: string };
-  nav: { how: string; features: string; install: string; github: string };
+  nav: {
+    how: string;
+    features: string;
+    faq: string;
+    install: string;
+    github: string;
+  };
   hero: {
     eyebrow: string;
     title: string;
@@ -63,6 +74,12 @@ export interface LandingCopy {
     headers: readonly [string, string, string, string];
     rows: readonly ComparisonRow[];
     full: string;
+  };
+  faq: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    items: readonly FaqItem[];
   };
   final: {
     eyebrow: string;

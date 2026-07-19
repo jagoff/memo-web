@@ -9,5 +9,7 @@ describe("localized content", () => {
     expect(CONTENT.en.comparison.rows.length).toBe(
       CONTENT.es.comparison.rows.length,
     );
+    expect(CONTENT.en.faq.items).toHaveLength(6);
+    expect(CONTENT.es.faq.items).toHaveLength(6);
   });
 });

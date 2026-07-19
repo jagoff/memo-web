@@ -8,7 +8,9 @@ const LINUX_COMMAND = 'pipx install "mlx-memo[cpu]"';
 test("renders the English title and hero", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page).toHaveTitle("memo — Local-first memory for AI agents");
+  await expect(page).toHaveTitle(
+    "Persistent Memory for AI Agents, Local & Private | memo",
+  );
   await expect(
     page.getByRole("heading", { level: 1, name: "Your AI should remember." }),
   ).toBeVisible();
@@ -17,7 +19,9 @@ test("renders the English title and hero", async ({ page }) => {
 test("renders the Spanish title and hero", async ({ page }) => {
   await page.goto("/es/");
 
-  await expect(page).toHaveTitle("memo — Memoria local para agentes de IA");
+  await expect(page).toHaveTitle(
+    "Memoria local y persistente para agentes de IA | memo",
+  );
   await expect(
     page.getByRole("heading", { level: 1, name: "Tu IA debería recordar." }),
   ).toBeVisible();

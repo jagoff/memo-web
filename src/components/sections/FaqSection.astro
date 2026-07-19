@@ -1,0 +1,178 @@
+---
+import type { LandingCopy } from "../../content";
+
+interface Props {
+  copy: LandingCopy["faq"];
+  id?: string;
+}
+
+const { copy, id = "faq" } = Astro.props;
+---
+
+<section class="faq-section" {id} aria-labelledby={`${id}-title`}>
+  <div class="container faq-inner">
+    <div class="faq-heading">
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2 id={`${id}-title`}>{copy.title}</h2>
+      <p>{copy.body}</p>
+    </div>
+
+    <div class="faq-list">
+      {
+        copy.items.map(({ question, answer }, index) => (
+          <details open={index === 0}>
+            <summary>
+              <span aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3>{question}</h3>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <p>{answer}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-section {
+    padding-block: var(--space-section);
+    border-top: 1px solid color-mix(in srgb, var(--paper-200) 10%, transparent);
+    background:
+      radial-gradient(
+        circle at 12% 12%,
+        color-mix(in srgb, var(--violet-700) 18%, transparent),
+        transparent 30%
+      ),
+      var(--ink-900);
+  }
+
+  .faq-inner {
+    display: grid;
+    align-items: start;
+    gap: clamp(3rem, 8vw, 7rem);
+    grid-template-columns: minmax(16rem, 0.72fr) minmax(22rem, 1.28fr);
+  }
+
+  .faq-heading {
+    position: sticky;
+    top: 8rem;
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .faq-heading .eyebrow,
+  .faq-heading h2,
+  .faq-heading p:last-child {
+    margin: 0;
+  }
+
+  .faq-heading h2 {
+    max-width: 11ch;
+    font: 500 clamp(3rem, 6vw, 5.5rem) / 0.96 var(--font-display);
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .faq-heading p:last-child {
+    max-width: 38rem;
+    color: var(--paper-200);
+    font-size: clamp(1rem, 1.6vw, 1.16rem);
+  }
+
+  .faq-list {
+    display: grid;
+    border-top: 1px solid color-mix(in srgb, var(--paper-200) 16%, transparent);
+  }
+
+  details {
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--paper-200) 16%, transparent);
+  }
+
+  summary {
+    display: grid;
+    min-height: 6rem;
+    align-items: center;
+    gap: var(--space-4);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding-block: var(--space-6);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary > span {
+    color: var(--signal-300);
+    font: 700 0.72rem/1 var(--font-mono);
+    letter-spacing: 0.1em;
+  }
+
+  summary h3 {
+    margin: 0;
+    font: 520 clamp(1.25rem, 2.4vw, 1.8rem) / 1.2 var(--font-display);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  summary svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: none;
+    stroke: var(--signal-300);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+    transition: transform 180ms ease;
+  }
+
+  details[open] summary svg {
+    transform: rotate(180deg);
+  }
+
+  details > p {
+    max-width: 48rem;
+    padding: 0 2.4rem var(--space-8);
+    margin: 0;
+    color: var(--paper-200);
+    font-size: 1rem;
+  }
+
+  @media (max-width: 800px) {
+    .faq-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .faq-heading {
+      position: static;
+    }
+  }
+
+  @media (max-width: 520px) {
+    summary {
+      align-items: start;
+      grid-template-columns: 1fr auto;
+    }
+
+    summary > span {
+      grid-column: 1 / -1;
+    }
+
+    details > p {
+      padding-left: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    summary svg {
+      transition: none;
+    }
+  }
+</style>

@@ -8,13 +8,15 @@ const locales = [
     path: "/",
     skip: "Skip to content",
     home: "memo home",
-    nav: ["How it works", "Features", "Install", "GitHub"],
+    nav: ["How it works", "Features", "FAQ", "Install", "GitHub"],
+    install: "Install",
   },
   {
     path: "/es/",
     skip: "Saltar al contenido",
     home: "Inicio de memo",
-    nav: ["Cómo funciona", "Funciones", "Instalar", "GitHub"],
+    nav: ["Cómo funciona", "Funciones", "Preguntas", "Instalar", "GitHub"],
+    install: "Instalar",
   },
 ] as const;
 
@@ -53,7 +55,7 @@ for (const locale of locales) {
           .getByRole("link", { name }),
       ),
       page.locator(".header-actions").getByRole("link", {
-        name: locale.nav[2],
+        name: locale.install,
       }),
       page
         .getByRole("group", {

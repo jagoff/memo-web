@@ -7,6 +7,7 @@ import SiteFooter from "./SiteFooter.astro";
 import SiteHeader from "./navigation/SiteHeader.astro";
 import ComparisonSection from "./sections/ComparisonSection.astro";
 import EvidenceSection from "./sections/EvidenceSection.astro";
+import FaqSection from "./sections/FaqSection.astro";
 import FeatureRail from "./sections/FeatureRail.astro";
 import FinalCTA from "./sections/FinalCTA.astro";
 import HeroSection from "./sections/HeroSection.astro";
@@ -23,7 +24,13 @@ const copy = getCopy(locale);
 const projectData = await loadProjectData();
 ---
 
-<BaseLayout {locale} meta={copy.meta}>
+<BaseLayout
+  {locale}
+  meta={copy.meta}
+  features={copy.features}
+  faq={copy.faq}
+  softwareVersion={projectData.data.pypiVersion}
+>
   <SiteHeader slot="header" {locale} copy={copy.nav} />
 
   <main id="main-content">
@@ -38,6 +45,7 @@ const projectData = await loadProjectData();
     <EvidenceSection {locale} copy={copy.evidence} {projectData} />
     <InstallSection id="install" copy={copy.install} />
     <ComparisonSection copy={copy.comparison} />
+    <FaqSection copy={copy.faq} />
     <FinalCTA copy={copy.final} />
   </main>
 

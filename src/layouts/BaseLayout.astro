@@ -2,15 +2,26 @@
 import Analytics from "@vercel/analytics/astro";
 
 import type { LandingCopy, Locale } from "../content";
-import { buildSeo } from "../lib/seo";
+import { buildSeo, buildStructuredData } from "../lib/seo";
 import "../styles/global.css";
 
 interface Props {
   locale: Locale;
   meta: LandingCopy["meta"];
+  features?: LandingCopy["features"];
+  faq?: LandingCopy["faq"];
+  softwareVersion?: string;
+  indexable?: boolean;
 }
 
-const { locale, meta } = Astro.props;
+const {
+  locale,
+  meta,
+  features = [],
+  faq,
+  softwareVersion = "",
+  indexable = true,
+} = Astro.props;
 const seo = buildSeo(locale, meta);
 const skipLabel = locale === "en" ? "Skip to content" : "Saltar al contenido";
 const ogLocale = locale === "en" ? "en_US" : "es_AR";
@@ -19,24 +30,18 @@ const imageAlt =
   locale === "en"
     ? "memo, local-first memory for AI agents"
     : "memo, memoria local para agentes de IA";
-const structuredData = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "memo",
-  description: meta.description,
-  url: seo.canonical,
-  codeRepository: "https://github.com/jagoff/memo",
-  downloadUrl: "https://pypi.org/project/mlx-memo/",
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "macOS, Linux",
-  isAccessibleForFree: true,
-  license: "https://opensource.org/license/mit/",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-}).replaceAll("<", "\\u003c");
+const structuredData =
+  indexable && faq
+    ? JSON.stringify(
+        buildStructuredData({
+          locale,
+          meta,
+          features,
+          faq,
+          softwareVersion,
+        }),
+      ).replaceAll("<", "\\u003c")
+    : undefined;
 ---
 
 <!doctype html>
@@ -46,31 +51,67 @@ const structuredData = JSON.stringify({
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{seo.title}</title>
     <meta name="description" content={seo.description} />
-    <link rel="canonical" href={seo.canonical} />
+    <meta
+      name="robots"
+      content={indexable
+        ? "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        : "noindex, follow"}
+    />
+    <meta name="author" content="Fernando Ferrari" />
+    <meta name="application-name" content="memo" />
+    <meta name="theme-color" content="#07050d" />
+    <meta name="color-scheme" content="dark" />
     {
-      seo.alternates.map(({ lang, href }) => (
-        <link rel="alternate" hreflang={lang} href={href} />
-      ))
+      indexable && (
+        <>
+          <link rel="canonical" href={seo.canonical} />
+          {seo.alternates.map(({ lang, href }) => (
+            <link rel="alternate" hreflang={lang} href={href} />
+          ))}
+          <link
+            rel="sitemap"
+            type="application/xml"
+            href="/sitemap-index.xml"
+          />
+        </>
+      )
     }
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="memo" />
-    <meta property="og:locale" content={ogLocale} />
-    <meta property="og:locale:alternate" content={alternateOgLocale} />
-    <meta property="og:title" content={seo.title} />
-    <meta property="og:description" content={seo.description} />
-    <meta property="og:url" content={seo.canonical} />
-    <meta property="og:image" content={seo.ogImage} />
-    <meta property="og:image:alt" content={imageAlt} />
+    {
+      indexable && (
+        <>
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content="memo" />
+          <meta property="og:locale" content={ogLocale} />
+          <meta property="og:locale:alternate" content={alternateOgLocale} />
+          <meta property="og:title" content={seo.title} />
+          <meta property="og:description" content={seo.description} />
+          <meta property="og:url" content={seo.canonical} />
+          <meta property="og:image" content={seo.ogImage.url} />
+          <meta property="og:image:secure_url" content={seo.ogImage.url} />
+          <meta property="og:image:width" content={String(seo.ogImage.width)} />
+          <meta
+            property="og:image:height"
+            content={String(seo.ogImage.height)}
+          />
+          <meta property="og:image:type" content={seo.ogImage.type} />
+          <meta property="og:image:alt" content={imageAlt} />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={seo.title} />
-    <meta name="twitter:description" content={seo.description} />
-    <meta name="twitter:image" content={seo.ogImage} />
-    <meta name="twitter:image:alt" content={imageAlt} />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={seo.title} />
+          <meta name="twitter:description" content={seo.description} />
+          <meta name="twitter:image" content={seo.ogImage.url} />
+          <meta name="twitter:image:alt" content={imageAlt} />
 
-    <script is:inline type="application/ld+json" set:html={structuredData} />
+          <script
+            is:inline
+            type="application/ld+json"
+            set:html={structuredData}
+          />
+        </>
+      )
+    }
   </head>
   <body>
     <a class="skip-link button button--primary" href="#main-content"
